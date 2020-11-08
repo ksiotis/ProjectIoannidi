@@ -8,8 +8,6 @@ class hashtable {
 private:
     int bucketNumber;
     avlTree<T>** table;
-    // int specsPerBucket;
-    // int bucketSize;
 
     unsigned int hash(T* rec);
     unsigned int hash(std::string temp);
@@ -26,17 +24,11 @@ public:
     void insert(T* rec);
 
     void printAll();
-
-    // void displaycliques(std::string date1, std::string date2);
-    // void displaycliques(std::string disease, std::string date1, std::string date2, std::string country);
-    // void displayCurrentcliques(std::string disease);
-    // void displayTopK_Diseases(std::string k, std::string key, std::string date1, std::string date2);
-    // void displayTopK_Countries(std::string k, std::string key, std::string date1, std::string date2);
 };
 
 template <typename T>
 unsigned int hashtable<T>::hash(T* rec) {
-    //return the hashed value of key in clique
+    //return the hashed value of key in spec
     std::string temp = (*rec).*key;
     return hash(temp);
 }
