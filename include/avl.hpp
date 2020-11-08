@@ -293,6 +293,20 @@ treeNode<T>* avlTree<T>::insert(T* rec) {
 }
 
 template <typename T>
+bool avlTree<T>::isInside(std::string testkey) {
+    if (root != NULL)
+        return root->isInside(testkey);
+    else
+        return false;
+}
+
+template <typename T>
+bool avlTree<T>::isInside(T* rec) {
+    std::string mykey = (*rec).*(treeNode<T>::keyValue);
+    return isInside(mykey);
+}
+
+template <typename T>
 void avlTree<T>::printTree() {
     std::cout << "Count: " << count << "\nPrinting Tree..." << std::endl;
     if (root != NULL)
