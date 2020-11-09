@@ -1,7 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
-#include <cstring>
+// #include <cstring>
 #include <string>
 
 template <typename T>
@@ -34,9 +34,11 @@ public:
     void insert(T* myValue);
 
     void printAll();
-    void sepuku(bool flag);
+    void emptyList(bool deleteContent);
     bool search(T);
-    T *remstart();
+    T *removeStart();
+
+    void merge(list<T>& a, list<T>&b);
 };
 
 //~~~~~~~~~~~~~~~~~~~listNode~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -49,20 +51,21 @@ listNode<T>::listNode(T* rec) {
 
 template <typename T>
 listNode<T>::~listNode() {
-    // delete content;
-    delete next;
+    if (next != NULL)
+        delete next;
 }
 
 template <typename T>
 T* listNode<T>::getContent() { return content; }
 
-template <typename T> 
+template <typename T>
 listNode<T>* listNode<T>::getNext() { return next; }
 
 template <typename T>
 void listNode<T>::setNext(listNode<T>* newNext) { next = newNext; }
 
 //~~~~~~~~~~~~~~~~~~~~~~~list~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 template <typename T>
 list<T>::list() {
     start = NULL;
@@ -96,6 +99,7 @@ void list<T>::insert(T* content) {
 template <typename T>
 void list<T>::printAll() {
     listNode<T> *curr = start;
+    std::cout << "Printing list..." << std::endl;
     for (int i = 0; i < count; ++i) {
         std::cout << *(curr->getContent()) << " ";
         curr = curr->getNext();
@@ -104,11 +108,12 @@ void list<T>::printAll() {
 }
 
 template <typename T>
-void list<T>::sepuku(bool flag) {
+void list<T>::emptyList(bool deleteContent) {
+
     listNode<T> *curr = start;
     int tempcount = count;
     for (int i = 0; i < tempcount; ++i) {
-        if (flag) {
+        if (deleteContent) {
             // std::cout << "deleting " << curr->getContent() << ": " << *(curr->getContent()) << std::endl;
             delete curr->getContent();
         }
@@ -131,7 +136,7 @@ bool list<T>::search(T test) {
 }
 
 template <typename T>
-T *list<T>::remstart() {
+T *list<T>::removeStart() {
     T *returnable;
     if (start != NULL) {
         listNode<T> *temp = start;
@@ -150,6 +155,21 @@ T *list<T>::remstart() {
     }
 
     return returnable;
+}
+
+template <typename T>
+void list<T>::merge(list<T> &a, list<T> &b) {
+    a.count += b.count;
+    if (a.end != NULL) {
+        a.end->setNext(b.start);
+    }
+    else {
+        a.start = b.start; 
+    }
+    if (b.end != NULL)
+        a.end = b.end;
+    b.start = NULL;
+    delete b;
 }
 
 #endif /* LIST_HPP */
