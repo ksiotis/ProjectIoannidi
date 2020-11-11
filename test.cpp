@@ -4,11 +4,16 @@
 #include <sys/types.h>
 #include <fstream>
 #include <sstream>
+#include "include/spec.hpp"
+#include "include/hashtable.hpp"
+
+template <typename T>
+std::string T::* treeNode<T>::keyValue = &spec::id;
 
 // using namespace std;
 typedef std::string string;
 
-void read_directory(const string name)
+void read_directory(const string name, hashtable<spec> *hashtab)
 {
     string path = name;
     string path2;
@@ -28,7 +33,7 @@ void read_directory(const string name)
         dirp2 = opendir(path2.c_str());
         if(dirp2 != 0){ //if directory read it
             closedir(dirp2);
-            read_directory(path2);
+            read_directory(path2, hashtab);
         }else { //if file
 
             // keep only the last folder + filename
@@ -43,6 +48,7 @@ void read_directory(const string name)
             path2 = token + "//" + path2;
             if((pos = path2.find(".json")) != string::npos){ // Remove .json extension
                 path2.erase(pos,path2.length());
+                hashtab->insert(new spec(path2));
                 // cout << path2 << endl;
             }
         }
@@ -51,10 +57,14 @@ void read_directory(const string name)
 }
 
 int main() {
-    // read_directory("./Datasets");
+    hashtable<spec> hashtab(21);
+
+    read_directory("./Datasets",&hashtab);
+
+    // hashtab.printAll();
 
 
-
+/********* CSV PART **********/
     std::ifstream inputFile("Datasets/sigmod_medium_labelled_dataset.csv");
     try {
         if (inputFile.is_open() == false) {
@@ -81,6 +91,10 @@ int main() {
         inputFile.close();
         return -1;
     }
+
+
+/********* END OF CSV PART **********/
+
 
     return 0;
 }

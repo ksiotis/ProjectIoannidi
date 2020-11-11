@@ -71,7 +71,7 @@ int hashtable<T>::getTotalCount() {
     int sum = 0;
     for (int i = 0; i < bucketNumber; i++) {
         if (table[i] != NULL)
-            sum += table[i].getCount();
+            sum += table[i]->getCount();
     }
     return sum;
 }
