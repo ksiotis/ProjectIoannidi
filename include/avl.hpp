@@ -32,6 +32,7 @@ public:
     treeNode* rotateRight();
     treeNode* insert(T* rec);
     bool isInside(std::string testkey);
+    T* getSpec(std::string testkey);
 
     void printTree();
 };
@@ -48,7 +49,8 @@ public:
     int getCount();
     bool isInside(std::string testkey);
     bool isInside(T* rec);
-
+    T* getSpec(std::string testkey);
+    
     treeNode<T>* insert(T* rec);
     void printTree();
 };
@@ -185,6 +187,25 @@ bool treeNode<T>::isInside(std::string testkey) {
 }
 
 template <typename T>
+T* treeNode<T>::getSpec(std::string testkey) {
+    std::string mykey = getKey();
+    if (mykey < testkey) {
+        if (right != NULL)
+            return right->getSpec(testkey);
+        else
+            return NULL;
+    }
+    else if (mykey > testkey) {
+        if (left != NULL)
+            return left->getSpec(testkey);
+        else
+            return NULL;
+    }
+    else
+        return getContent();
+}
+
+template <typename T>
 void treeNode<T>::printTree() {
     for (int i = 0; i < height; i++) {
         std::cout << " ";
@@ -241,6 +262,14 @@ template <typename T>
 bool avlTree<T>::isInside(T* rec) {
     std::string mykey = (*rec).*(treeNode<T>::keyValue);
     return isInside(mykey);
+}
+
+template <typename T>
+T* avlTree<T>::getSpec(std::string testkey) {
+    if (root != NULL)
+        return root->getSpec(testkey);
+    else
+        return NULL;
 }
 
 template <typename T>

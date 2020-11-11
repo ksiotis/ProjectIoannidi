@@ -22,6 +22,7 @@ public:
     bool isInside(T* rec);
     bool isInside(std::string testkey);
     void insert(T* rec);
+    T* getSpec(std::string testkey);
 
     void printAll();
 };
@@ -104,6 +105,15 @@ void hashtable<T>::insert(T* rec) {
             table[bucket]=new avlTree<T>();
         table[bucket]->insert(rec);
     }
+}
+
+template <typename T>
+T* hashtable<T>::getSpec(std::string testkey) {
+    unsigned int bucket = hash(testkey);
+    if (table[bucket] != NULL)
+        return table[bucket].getSpec(testkey);
+    else
+        return NULL;
 }
 
 template <typename T>
