@@ -1,9 +1,12 @@
 #include <iostream>
 #include <dirent.h>
-#include <string.h>
+#include <cstring>
 #include <sys/types.h>
+#include <fstream>
+#include <sstream>
 
-using namespace std;
+// using namespace std;
+typedef std::string string;
 
 void read_directory(const string name)
 {
@@ -12,7 +15,7 @@ void read_directory(const string name)
     DIR* dirp = opendir(name.c_str());
     DIR* dirp2;
     if(dirp == 0){
-        cout << "no such dir  " << path << endl;
+        std::cout << "no such dir  " << path << std::endl;
         return;
     }
     // cout << path << endl;
@@ -40,7 +43,7 @@ void read_directory(const string name)
             path2 = token + "//" + path2;
             if((pos = path2.find(".json")) != string::npos){ // Remove .json extension
                 path2.erase(pos,path2.length());
-                cout << path2 << endl;
+                // cout << path2 << endl;
             }
         }
     }
@@ -48,7 +51,36 @@ void read_directory(const string name)
 }
 
 int main() {
-    cout << "Hello World!" << endl;
-    read_directory("./Datasets");
+    // read_directory("./Datasets");
+
+
+
+    std::ifstream inputFile("Datasets/sigmod_medium_labelled_dataset.csv");
+    try {
+        if (inputFile.is_open() == false) {
+            throw "Can't open file!";
+        }
+
+        std::string line;
+        while (getline(inputFile, line)) { //for every line in file
+            if (line.back() == *(char*)"1") {
+                //line is ending in 1
+                std::string id1,id2;
+                id1 = line.substr(0, line.find(","));
+                line.erase(0, id1.length()+1);
+
+                id2 = line.substr(0, line.find(","));
+                std::cout << id1 << "\t" << id2 << std::endl;
+
+                
+            }
+        }
+    }
+    catch (const char* e) {
+        std::cout << "File Error! " << e << std::endl;
+        inputFile.close();
+        return -1;
+    }
+
     return 0;
 }
