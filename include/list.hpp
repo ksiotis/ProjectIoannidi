@@ -38,7 +38,7 @@ public:
     bool search(T);
     T *removeStart();
 
-    void merge(list<T>& a, list<T>&b);
+    static void merge(list<T>& a, list<T>&b);
 };
 
 //~~~~~~~~~~~~~~~~~~~listNode~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -168,8 +168,10 @@ void list<T>::merge(list<T> &a, list<T> &b) {
     }
     if (b.end != NULL)
         a.end = b.end;
+    b.count=0;
     b.start = NULL;
-    delete b;
+    // b.end=NULL;
+    // delete b;
 }
 
 #endif /* LIST_HPP */

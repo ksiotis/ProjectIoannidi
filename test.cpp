@@ -4,8 +4,10 @@
 #include <sys/types.h>
 #include <fstream>
 #include <sstream>
+
 #include "include/spec.hpp"
 #include "include/hashtable.hpp"
+#include "include/list.hpp"
 
 template <typename T>
 std::string T::* treeNode<T>::keyValue = &spec::id;
@@ -13,7 +15,8 @@ std::string T::* treeNode<T>::keyValue = &spec::id;
 // using namespace std;
 typedef std::string string;
 
-void read_directory(const string name, hashtable<spec> *hashtab)
+void read_directory(const string name, hashtable<spec> &hashtab, 
+        list<spec> &specContainer, list<clique> &cliqueContainer)
 {
     string path = name;
     string path2;
@@ -33,7 +36,7 @@ void read_directory(const string name, hashtable<spec> *hashtab)
         dirp2 = opendir(path2.c_str());
         if(dirp2 != 0){ //if directory read it
             closedir(dirp2);
-            read_directory(path2, hashtab);
+            read_directory(path2, hashtab, specContainer, cliqueContainer);
         }else { //if file
 
             // keep only the last folder + filename
@@ -48,8 +51,10 @@ void read_directory(const string name, hashtable<spec> *hashtab)
             path2 = token + "//" + path2;
             if((pos = path2.find(".json")) != string::npos){ // Remove .json extension
                 path2.erase(pos,path2.length());
-                hashtab->insert(new spec(path2));
-                // cout << path2 << endl;
+
+                spec *currentSpec = new spec(path2, cliqueContainer);
+                specContainer.insert(currentSpec);
+                hashtab.insert(currentSpec);
             }
         }
     }
@@ -57,9 +62,11 @@ void read_directory(const string name, hashtable<spec> *hashtab)
 }
 
 int main() {
-    hashtable<spec> hashtab(21);
+    hashtable<spec> hashtab(5);
+    list<spec> specContainer;
+    list<clique> cliqueContainer;
 
-    read_directory("./Datasets",&hashtab);
+    read_directory("./Datasets", hashtab, specContainer, cliqueContainer);
 
     // hashtab.printAll();
 
@@ -72,6 +79,7 @@ int main() {
         }
 
         std::string line;
+        getline(inputFile, line); //skip first line
         while (getline(inputFile, line)) { //for every line in file
             if (line.back() == *(char*)"1") {
                 //line is ending in 1
@@ -80,9 +88,9 @@ int main() {
                 line.erase(0, id1.length()+1);
 
                 id2 = line.substr(0, line.find(","));
-                std::cout << id1 << "\t" << id2 << std::endl;
+                // std::cout << id1 << "\t" << id2 << std::endl;
 
-                
+                hashtab.getSpec(id1)->merge(hashtab.getSpec(id2)); 
             }
         }
     }
@@ -92,7 +100,27 @@ int main() {
         return -1;
     }
 
+    //for debugging
+    // listNode<clique> *current = cliqueContainer.getStart();
+    // while (current != NULL) {
+    //     std::cout << current->getContent()->getContentList()->getCount() << " ";
+    //     current = current->getNext();
+    // }
+    // std::cout << std::endl;
 
+    list<spec> *test = hashtab.getSpec("www.garricks.com.au//31")->getClique()->getContentList();
+    listNode<spec> *currentSpec = test->getStart();
+    clique* targetClique = currentSpec->getContent()->getClique();
+    while (currentSpec != NULL) {
+        if (currentSpec->getContent()->getClique() != targetClique)
+            std::cout << "Bad clique: " << currentSpec->getContent()->getId() << std::endl;
+        std::cout << currentSpec->getContent()->getId() << std::endl;
+        currentSpec = currentSpec->getNext();
+    }
+    std::cout << std::endl;
+
+
+    specContainer.emptyList(true);
 /********* END OF CSV PART **********/
 
 

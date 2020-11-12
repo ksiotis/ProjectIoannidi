@@ -111,7 +111,7 @@ template <typename T>
 T* hashtable<T>::getSpec(std::string testkey) {
     unsigned int bucket = hash(testkey);
     if (table[bucket] != NULL)
-        return table[bucket].getSpec(testkey);
+        return table[bucket]->getSpec(testkey);
     else
         return NULL;
 }
