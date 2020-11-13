@@ -53,3 +53,22 @@ void clique::merge(clique *second) {
     }
     list<spec>::merge(content, *(second->getContentList()));
 }
+
+void clique::printPairs() {
+    listNode<spec> *first = content.getStart();
+    while (first != NULL) {
+        listNode<spec> *second = first->getNext();
+        while (second != NULL) {
+            if (first == second) {
+                std::cerr << "Bad clique in printPairs" << std::endl;
+            }
+            std::cout << first->getContent()->getId() <<
+            " " << second->getContent()->getId() << std::endl;
+
+            second = second->getNext();
+        }
+
+        first = first->getNext();
+    }
+
+}

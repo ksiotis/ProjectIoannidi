@@ -101,23 +101,22 @@ int main() {
     }
 
     //for debugging
-    // listNode<clique> *current = cliqueContainer.getStart();
-    // while (current != NULL) {
-    //     std::cout << current->getContent()->getContentList()->getCount() << " ";
-    //     current = current->getNext();
+    listNode<clique> *current = cliqueContainer.getStart();
+    while (current != NULL) {
+        current->getContent()->printPairs();
+        current = current->getNext();
+    }
+
+    // list<spec> *test = hashtab.getSpec("www.garricks.com.au//31")->getClique()->getContentList();
+    // listNode<spec> *currentSpec = test->getStart();
+    // clique* targetClique = currentSpec->getContent()->getClique();
+    // while (currentSpec != NULL) {
+    //     if (currentSpec->getContent()->getClique() != targetClique)
+    //         std::cout << "Bad clique: " << currentSpec->getContent()->getId() << std::endl;
+    //     std::cout << currentSpec->getContent()->getId() << std::endl;
+    //     currentSpec = currentSpec->getNext();
     // }
     // std::cout << std::endl;
-
-    list<spec> *test = hashtab.getSpec("www.garricks.com.au//31")->getClique()->getContentList();
-    listNode<spec> *currentSpec = test->getStart();
-    clique* targetClique = currentSpec->getContent()->getClique();
-    while (currentSpec != NULL) {
-        if (currentSpec->getContent()->getClique() != targetClique)
-            std::cout << "Bad clique: " << currentSpec->getContent()->getId() << std::endl;
-        std::cout << currentSpec->getContent()->getId() << std::endl;
-        currentSpec = currentSpec->getNext();
-    }
-    std::cout << std::endl;
 
 
     specContainer.emptyList(true);

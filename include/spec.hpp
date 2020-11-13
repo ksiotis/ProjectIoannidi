@@ -34,6 +34,7 @@ public:
     list<spec>* getContentList();
 
     void merge(clique *second);
+    void printPairs();
 };
 
 #endif /* SPEC_HPP */
