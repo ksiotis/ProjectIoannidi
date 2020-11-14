@@ -6,8 +6,6 @@ enum char_code {
     item_value,
     escape,
     comma,
-    file_start,
-    file_end,
     list_start,
     list_end
 };
