@@ -31,12 +31,14 @@ public:
 
     int getCount();
     listNode<T>* getStart();
+    listNode<T>* getEnd();
     void insert(T* myValue);
 
     void printAll();
     void emptyList(bool deleteContent);
     bool search(T);
     T *removeStart();
+    T* getContentByValue(std::string testkey);
 
     static void merge(list<T>& a, list<T>&b);
 };
@@ -84,6 +86,9 @@ int list<T>::getCount() { return count; }
 
 template <typename T>
 listNode<T>* list<T>::getStart() { return start; }
+
+template <typename T>
+listNode<T>* list<T>::getEnd() { return end; }
 
 template <typename T>
 void list<T>::insert(T* content) {
@@ -155,6 +160,19 @@ T *list<T>::removeStart() {
     }
 
     return returnable;
+}
+
+template <typename T>
+T* list<T>::getContentByValue(std::string testkey) {
+
+    listNode<T> *current = start;
+    while (current != NULL) {
+        if (testkey == current->getContent()->getKey())
+            return current->getContent();
+        else
+            current = current->getNext();
+    }
+    return NULL;
 }
 
 template <typename T>

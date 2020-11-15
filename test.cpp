@@ -8,6 +8,7 @@
 #include "include/spec.hpp"
 #include "include/hashtable.hpp"
 #include "include/list.hpp"
+#include "include/jsonParser.hpp"
 
 template <typename T>
 std::string T::* treeNode<T>::keyValue = &spec::id;
@@ -90,7 +91,7 @@ int main() {
                 id2 = line.substr(0, line.find(","));
                 // std::cout << id1 << "\t" << id2 << std::endl;
 
-                hashtab.getSpec(id1)->merge(hashtab.getSpec(id2)); 
+                hashtab.getContentByValue(id1)->merge(hashtab.getContentByValue(id2)); 
             }
         }
     }
@@ -100,16 +101,19 @@ int main() {
         return -1;
     }
 
-    //for debugging
-    listNode<clique> *current = cliqueContainer.getStart();
-    while (current != NULL) {
-        current->getContent()->printPairs();
-        current = current->getNext();
-    }
+    //~~~~~~~~debugging~~~~~~~~~~~
 
-    // list<spec> *test = hashtab.getSpec("www.garricks.com.au//31")->getClique()->getContentList();
-    // listNode<spec> *currentSpec = test->getStart();
-    // clique* targetClique = currentSpec->getContent()->getClique();
+    //print pairs -> 3582 lines
+    // listNode<clique> *current = cliqueContainer.getStart();
+    // while (current != NULL) {
+    //     current->getContent()->printPairs();
+    //     current = current->getNext();
+    // }
+
+    //print all 
+    
+
+    
     // while (currentSpec != NULL) {
     //     if (currentSpec->getContent()->getClique() != targetClique)
     //         std::cout << "Bad clique: " << currentSpec->getContent()->getId() << std::endl;
@@ -118,6 +122,17 @@ int main() {
     // }
     // std::cout << std::endl;
 
+    jsonParser parser;
+    parser.parse("Datasets/2013_camera_specs/cammarkt.com/390.json");
+    // parser.object.addProperty("1","ass");
+    // parser.object.addProperty("2","ass2");
+    // parser.object.addProperty("3","ass3");
+
+    // parser.object.addaray("4");
+    // parser.object.insert("4","4ass1");
+    // parser.object.insert("4","4ass2");
+
+    // std::cout << ((array*)parser.object.content.getContentByValue("4"))->getContent()->getStart()->getContent()->getValue();
 
     specContainer.emptyList(true);
 /********* END OF CSV PART **********/
