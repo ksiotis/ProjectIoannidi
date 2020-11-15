@@ -135,6 +135,7 @@ int main() {
     // std::cout << ((array*)parser.object.content.getContentByValue("4"))->getContent()->getStart()->getContent()->getValue();
 
     specContainer.emptyList(true);
+    cliqueContainer.emptyList(true);
 /********* END OF CSV PART **********/
 
 
