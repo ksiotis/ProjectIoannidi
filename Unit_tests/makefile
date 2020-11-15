@@ -1,6 +1,9 @@
 CC=g++
 CFLAGS=-std=c++11 -Wall -g3
 
+list_test: ../include/list.hpp list_test.cpp
+	$(CC) $(CFLAGS) list_test.cpp -o list_test
+
 example: example.o utilities.o spec.o
 	$(CC) $(CFLAGS) ../builder/example.o  ../builder/spec.o  ../builder/utilities.o -o example
 
@@ -14,4 +17,4 @@ example.o: example.cpp
 	$(CC) $(CFLAGS) -c example.cpp -o ../builder/example.o
 
 clean:
-	rm -rf example ../builder/*
+	rm -rf example ../builder/* list_test
