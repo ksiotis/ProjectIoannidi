@@ -154,11 +154,14 @@ TODO
                         word+=c;
                         break;
                     }
+
+
+                    // check if the char is about item or the value (also if ended or just started)
                     if(!item_start_flag){
                         word = "";
                         item_start_flag = true;
                     }else if(!item_end_flag){
-                        // std::cout << "KEY IS " << word << " : "; /* KEY */
+                        
                         key = word;
 
                         word = "";
@@ -169,7 +172,6 @@ TODO
                     }else{
                         value_end_flag = true;
 
-                        // std::cout << "\"" << word << "\" "; /* VALUE */
                         value = word;
                         if (list_counter == 0) {
                             object->addProperty(key, value);
@@ -182,23 +184,21 @@ TODO
                     }
                     escape_char_flag = false;
                     break;
-                case escape:
+                case escape: // escape char / 
                     escape_char_flag = true;
                     word+=c;
                     break;
-                case comma:
-                    if( (item_start_flag && !item_end_flag) || (value_start_flag && !value_end_flag) ){
+                case comma: // comma can be in a "" or to seperate item,value pairs or to seperate list items
+                    if( (item_start_flag && !item_end_flag) || (value_start_flag && !value_end_flag) ){ // in ""
                         word+=c;
                         break;
                     }
                     if(item_start_flag && item_end_flag){
-                        if(list_counter > 0 ){
+                        if(list_counter > 0 ){ // list item seperation
                             value_start_flag = false;
                             value_end_flag = false;
-                            // std::cout << ",";
                             word="";
-                        }else{
-                            // std::cout << std::endl;       /* END OF OBJECT (KEY,VALUES)*/
+                        }else{ // item,value seperation
                             item_start_flag = false;
                             item_end_flag = false;
                             value_start_flag = false;
@@ -211,8 +211,8 @@ TODO
                     }
                     escape_char_flag = false;
                     break;
-                case list_start:
-                    if( (item_start_flag && !item_end_flag) || (value_start_flag && !value_end_flag) ){
+                case list_start: // [
+                    if( (item_start_flag && !item_end_flag) || (value_start_flag && !value_end_flag) ){ // in a ""
                         word+=c;
                         break;
                     }
@@ -220,7 +220,7 @@ TODO
                     escape_char_flag = false;
                     break;
                 case list_end:
-                    if( (item_start_flag && !item_end_flag) || (value_start_flag && !value_end_flag) ){
+                    if( (item_start_flag && !item_end_flag) || (value_start_flag && !value_end_flag) ){ // in a ""
                         word+=c;
                         break;
                     }
