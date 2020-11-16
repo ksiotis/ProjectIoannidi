@@ -33,6 +33,7 @@ property::~property() {}
 std::string property::getValue() { return value; }
 
 void property::addValue(std::string nvalue) {
+//its a setValue
     value = nvalue;
 }
 
@@ -57,6 +58,8 @@ array::~array() {
 list<property>* array::getContent() { return &content; }
 
 void array::addValue(std::string nvalue) {
+/*adds property with key-value <nvalue>
+  to array*/
     property *temp = new property(nvalue);
     content.insert(temp);
 }
@@ -83,12 +86,16 @@ jsonObject::~jsonObject() {
     content.emptyList(true);
 }
 
+//TODO add checks if items already exist
+
 void jsonObject::addaray(std::string key) {
+/*adds array element to object, given a key*/
     array* temp = new array(key);
     content.insert(temp);
 }
 
 void jsonObject::insert(std::string key, std::string value) {
+/*insert a property value to array key*/
     listNode<data>* current = content.getStart();
     while (current != NULL) {
 
@@ -104,6 +111,7 @@ void jsonObject::insert(std::string key, std::string value) {
 }
 
 void jsonObject::addProperty(std::string key, std::string value) {
+/*insert a property key with value to object*/
     property* temp = new property(key, value);
     content.insert(temp);
 }
@@ -125,6 +133,9 @@ jsonParser::jsonParser() {}
 jsonParser::~jsonParser() {}
 
 jsonObject* jsonParser::parse(std::string path_to_file) {
+/*
+TODO
+*/
     try {
         object = new jsonObject();
 

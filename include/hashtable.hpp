@@ -12,8 +12,10 @@ private:
     unsigned int hash(T* rec);
     unsigned int hash(std::string temp);
 public:
-    std::string T::*key;//pointer to data member of T, which is a string
-    
+    std::string T::*key;
+    /*pointer to data member of T, which is a string
+    gets its value from treeNode<T>::keyValue*/
+
     hashtable(int buckets);
     ~hashtable();
 
@@ -29,14 +31,15 @@ public:
 
 template <typename T>
 unsigned int hashtable<T>::hash(T* rec) {
-    //return the hashed value of key in spec
+/*return the hashed value of key in rec
+requires this->key to be set to key field in typeof(rec)*/
     std::string temp = (*rec).*key;
     return hash(temp);
 }
 
 template <typename T>
 unsigned int hashtable<T>::hash(std::string temp) {
-    //return the hashed value of given string
+//return the hashed value of given string
     unsigned int product = 1;
     for (int i = 0, lenght = temp.length(); i < lenght; ++i) {
         product *= temp[i];
@@ -78,6 +81,7 @@ int hashtable<T>::getTotalCount() {
 
 template <typename T>
 bool hashtable<T>::isInside(T* rec) {
+// is something equal to the key of rec inside?
     unsigned int bucket = hash(rec);
     if (table[bucket] != NULL)
         return table[bucket]->isInside(rec);
@@ -87,6 +91,7 @@ bool hashtable<T>::isInside(T* rec) {
 
 template <typename T>
 bool hashtable<T>::isInside(std::string testkey) {
+// is something equal to testkey inside?
     unsigned int bucket = hash(testkey);
     if (table[bucket] != NULL)
         return table[bucket]->isInside(testkey);
@@ -96,6 +101,9 @@ bool hashtable<T>::isInside(std::string testkey) {
 
 template <typename T>
 void hashtable<T>::insert(T* rec) {
+/*attempts to insert rec into the hashtable,
+  if it exists => displays error,
+  if not => inserts rec to the avl tree of apropriate bucket*/
     if (isInside(rec)) { //if keyvalue is already in a bucket...
         std::cout << "Attempted to insert identical id: " << (*rec).*key << std::endl;
     }
@@ -109,6 +117,8 @@ void hashtable<T>::insert(T* rec) {
 
 template <typename T>
 T* hashtable<T>::getContentByKeyValue(std::string testkey) {
+/*get pointer to item with keyValue of testkey
+  item must have function getKey*/
     unsigned int bucket = hash(testkey);
     if (table[bucket] != NULL)
         return table[bucket]->getContentByKeyValue(testkey);
@@ -118,6 +128,7 @@ T* hashtable<T>::getContentByKeyValue(std::string testkey) {
 
 template <typename T>
 void hashtable<T>::printAll() {
+//for debugging purposes
     for (int i=0; i < bucketNumber; i++) {
         std::cout << "Tree " << std::to_string(i) << ":" << std::endl;
         if (table[i] != NULL)

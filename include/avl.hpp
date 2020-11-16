@@ -252,6 +252,7 @@ treeNode<T>* avlTree<T>::insert(T* rec) {
 
 template <typename T>
 bool avlTree<T>::isInside(std::string testkey) {
+// is something equal to testkey in the tree?
     if (root != NULL)
         return root->isInside(testkey);
     else
@@ -260,12 +261,16 @@ bool avlTree<T>::isInside(std::string testkey) {
 
 template <typename T>
 bool avlTree<T>::isInside(T* rec) {
+/* is something equal to the key of rec in the tree?
+treeNode<T>::keyValue is required to be set to the key of rec*/
     std::string mykey = (*rec).*(treeNode<T>::keyValue);
     return isInside(mykey);
 }
 
 template <typename T>
 T* avlTree<T>::getContentByKeyValue(std::string testkey) {
+/*get pointer to item with keyValue of testkey
+  item must have function getKey*/
     if (root != NULL)
         return root->getContentByKeyValue(testkey);
     else
@@ -274,6 +279,7 @@ T* avlTree<T>::getContentByKeyValue(std::string testkey) {
 
 template <typename T>
 void avlTree<T>::printTree() {
+/*for debugging purposes*/
     if (root != NULL)
         root->printTree();
     else

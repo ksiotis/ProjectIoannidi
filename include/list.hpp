@@ -92,6 +92,7 @@ listNode<T>* list<T>::getEnd() { return end; }
 
 template <typename T>
 void list<T>::insert(T* content) {
+//insert to the end of list
     listNode<T>* temp = new listNode<T>(content);
     if (start != NULL)
         end->setNext(temp);
@@ -103,6 +104,7 @@ void list<T>::insert(T* content) {
 
 template <typename T>
 void list<T>::printAll() {
+//print all elements in list, if content can be printed
     listNode<T> *curr = start;
     std::cout << "Printing list..." << std::endl;
     for (int i = 0; i < count; ++i) {
@@ -114,12 +116,12 @@ void list<T>::printAll() {
 
 template <typename T>
 void list<T>::emptyList(bool deleteContent) {
-
+/*empty list by deleting all listNodes,
+  deleteContent is a flag of wheather to delete the content of pointers in nodes*/
     listNode<T> *curr = start;
     int tempcount = count;
     for (int i = 0; i < tempcount; ++i) {
         if (deleteContent) {
-            // std::cout << "deleting " << curr->getContent() << ": " << *(curr->getContent()) << std::endl;
             delete curr->getContent();
         }
         curr = curr->getNext();
@@ -131,6 +133,7 @@ void list<T>::emptyList(bool deleteContent) {
 
 template <typename T>
 bool list<T>::search(T test) {
+//is something equal to test inside?
     listNode<T> *curr = start;
     for (int i = 0; i < count; ++i) {
         if (*(curr->getContent()) == test)
@@ -142,6 +145,8 @@ bool list<T>::search(T test) {
 
 template <typename T>
 T *list<T>::removeStart() {
+/*remove the starting node and return its pointer
+  used for FIFO*/
     T *returnable;
     if (start != NULL) {
         listNode<T> *temp = start;
@@ -164,7 +169,8 @@ T *list<T>::removeStart() {
 
 template <typename T>
 T* list<T>::getContentByKeyValue(std::string testkey) {
-
+/*get pointer to item with keyValue of testkey
+  item must have function getKey*/
     listNode<T> *current = start;
     while (current != NULL) {
         if (testkey == current->getContent()->getKey())
@@ -177,6 +183,7 @@ T* list<T>::getContentByKeyValue(std::string testkey) {
 
 template <typename T>
 void list<T>::merge(list<T> &a, list<T> &b) {
+/*merge list b to list a, does NOT delete list b*/
     a.count += b.count;
     if (a.end != NULL) {
         a.end->setNext(b.start);
