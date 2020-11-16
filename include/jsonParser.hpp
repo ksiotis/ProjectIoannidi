@@ -19,7 +19,7 @@ public:
     std::string getKey();
     void setKey(std::string nkey);
     virtual void addValue(std::string value) {};
-    virtual void print() {};
+    virtual void print(int tabs) {};
 };
 //~~~~~~~~~~~~
 class property: public data {
@@ -32,7 +32,7 @@ public:
 
     std::string getValue();
     void addValue(std::string nvalue);
-    virtual void print();
+    virtual void print(int tabs);
 };
 //~~~~~~~~~~~~
 class array: public data {
@@ -44,7 +44,7 @@ public:
 
     list<property>* getContent();
     void addValue(std::string nvalue);
-    virtual void print();
+    virtual void print(int tabs);
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

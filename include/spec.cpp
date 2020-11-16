@@ -54,7 +54,7 @@ void clique::merge(clique *second) {
     list<spec>::merge(content, *(second->getContentList()));
 }
 
-void clique::printPairs() {
+void clique::writePairs(std::ofstream &ofile) {
     listNode<spec> *first = content.getStart();
     while (first != NULL) {
         listNode<spec> *second = first->getNext();
@@ -62,8 +62,8 @@ void clique::printPairs() {
             if (first == second) {
                 std::cerr << "Bad clique in printPairs" << std::endl;
             }
-            std::cout << first->getContent()->getId() <<
-            " " << second->getContent()->getId() << std::endl;
+            ofile << first->getContent()->getId() <<
+            "," << second->getContent()->getId() << "\n";
 
             second = second->getNext();
         }

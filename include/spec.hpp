@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 
 #include "list.hpp"
 
@@ -34,7 +35,7 @@ public:
     list<spec>* getContentList();
 
     void merge(clique *second);
-    void printPairs();
+    void writePairs(std::ofstream &ofile);
 };
 
 #endif /* SPEC_HPP */

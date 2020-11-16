@@ -35,7 +35,9 @@ void property::addValue(std::string nvalue) {
     value = nvalue;
 }
 
-void property::print() {
+void property::print(int tabs) {
+    for (int i = 0; i < tabs; i++)
+        std::cout << "\t";
     if (key != "")
         std::cout << "\"" << key << "\": ";
     std::cout << value << std::endl;
@@ -58,12 +60,18 @@ void array::addValue(std::string nvalue) {
     content.insert(temp);
 }
 
-void array::print() {
+void array::print(int tabs) {
+    for (int i = 0; i < tabs; i++)
+        std::cout << "\t";
+    std::cout << "\"" << key << "\": [\n";
     listNode<property> *current = content.getStart();
     while (current != NULL) {
-        current->getContent()->print();
+        current->getContent()->print(tabs+1);
         current = current->getNext();
     }
+    for (int i = 0; i < tabs; i++)
+        std::cout << "\t";
+    std::cout << "]\n";
 }
 
 //~~~~~~~~~~~~~~jsonObject~~~~~~~~~~~~~~~~~
@@ -100,11 +108,13 @@ void jsonObject::addProperty(std::string key, std::string value) {
 }
 
 void jsonObject::print() {
+    std::cout << "{\n";
     listNode<data> *current = content.getStart();
     while (current != NULL) {
-        current->getContent()->print();
+        current->getContent()->print(1);
         current = current->getNext();
     }
+    std::cout << "}\n";
 }
 
 //~~~~~~~~~~~~~~jsonParser~~~~~~~~~~~~~~~~~

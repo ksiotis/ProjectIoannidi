@@ -158,14 +158,22 @@ int main(int argc, char** argv) {
     if (readCSV(csv_file, hashtab) != 0) {
         return -1; //if it failed stop
     }
-    //out pairs to file
     if (extractPairs(cliqueContainer, csvOutputFile) != 0) {
         return -1; //if it failed stop
     }
 
+    
+    
+    //json parser example
+    jsonParser parser;
+    jsonObject* json = parser.parse("Datasets/2013_camera_specs/cammarkt.com/390.json");
+    json->print();
+
+
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);
+    delete json;
 /********* END OF CSV PART **********/
 
 
