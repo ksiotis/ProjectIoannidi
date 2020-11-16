@@ -35,6 +35,12 @@ void property::addValue(std::string nvalue) {
     value = nvalue;
 }
 
+void property::print() {
+    if (key != "")
+        std::cout << "\"" << key << "\": ";
+    std::cout << value << std::endl;
+}
+
 //~~~~~~~~~~~~~~array~~~~~~~~~~~~~~~~~
 
 array::array(std::string nkey):
@@ -50,6 +56,14 @@ list<property>* array::getContent() { return &content; }
 void array::addValue(std::string nvalue) {
     property *temp = new property(nvalue);
     content.insert(temp);
+}
+
+void array::print() {
+    listNode<property> *current = content.getStart();
+    while (current != NULL) {
+        current->getContent()->print();
+        current = current->getNext();
+    }
 }
 
 //~~~~~~~~~~~~~~jsonObject~~~~~~~~~~~~~~~~~
@@ -85,14 +99,24 @@ void jsonObject::addProperty(std::string key, std::string value) {
     content.insert(temp);
 }
 
+void jsonObject::print() {
+    listNode<data> *current = content.getStart();
+    while (current != NULL) {
+        current->getContent()->print();
+        current = current->getNext();
+    }
+}
+
 //~~~~~~~~~~~~~~jsonParser~~~~~~~~~~~~~~~~~
 
 jsonParser::jsonParser() {}
 
 jsonParser::~jsonParser() {}
 
-void jsonParser::parse(std::string path_to_file) {
+jsonObject* jsonParser::parse(std::string path_to_file) {
     try {
+        object = new jsonObject();
+
         std::ifstream is(path_to_file); // open file
 
         if (!is.is_open()) //check if file is open
@@ -126,10 +150,10 @@ void jsonParser::parse(std::string path_to_file) {
                         // std::cout << "\"" << word << "\" "; /* VALUE */
                         value = word;
                         if (list_counter == 0) {
-                            object.addProperty(key, value);
+                            object->addProperty(key, value);
                         }
                         else {
-                            object.insert(key, value);
+                            object->insert(key, value);
                         }
 
                         word = "";
@@ -190,8 +214,11 @@ void jsonParser::parse(std::string path_to_file) {
         }
         // std::cout << std::endl;
         is.close();                // close file
+        return object;
     }
-    catch(const char *e) {
+    catch (const char *e) {
         std::cerr << e << '\n';
+        delete object;
+        return NULL;
     }
 }

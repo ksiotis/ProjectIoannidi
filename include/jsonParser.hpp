@@ -9,7 +9,7 @@
 // #include <avl.hpp>
 
 class data {
-private:
+protected:
     std::string key;
 public:
     data(std::string nkey);
@@ -19,6 +19,7 @@ public:
     std::string getKey();
     void setKey(std::string nkey);
     virtual void addValue(std::string value) {};
+    virtual void print() {};
 };
 //~~~~~~~~~~~~
 class property: public data {
@@ -31,6 +32,7 @@ public:
 
     std::string getValue();
     void addValue(std::string nvalue);
+    virtual void print();
 };
 //~~~~~~~~~~~~
 class array: public data {
@@ -42,6 +44,7 @@ public:
 
     list<property>* getContent();
     void addValue(std::string nvalue);
+    virtual void print();
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,6 +59,7 @@ public:
     void addaray(std::string key);
     void insert(std::string key, std::string value);
     void addProperty(std::string key, std::string value);
+    void print();
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,13 +93,12 @@ private:
         // else return item_value; // is this good?
     }
 
+    jsonObject *object;
 public:
-    jsonObject object;
     jsonParser();
     ~jsonParser();
 
-    void parse(std::string path_to_file);
-    jsonObject extractJsonObject();
+    jsonObject* parse(std::string path_to_file);
 };
 
 
