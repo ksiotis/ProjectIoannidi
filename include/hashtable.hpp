@@ -89,7 +89,7 @@ template <typename T>
 bool hashtable<T>::isInside(std::string testkey) {
     unsigned int bucket = hash(testkey);
     if (table[bucket] != NULL)
-        return table[bucket].isInside(testkey);
+        return table[bucket]->isInside(testkey);
     else
         return false;
 }
