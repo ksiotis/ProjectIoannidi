@@ -81,7 +81,8 @@ private:
         escape,
         comma,
         list_start,
-        list_end
+        list_end,
+        nada
     };
 
     char_code enum_it (char const& inString) {
@@ -90,7 +91,7 @@ private:
         if (inString == ',') return comma;
         if (inString == '[') return list_start;
         if (inString == ']') return list_end;
-        // else return item_value; // is this good?
+        return nada;
     }
 
     jsonObject *object;

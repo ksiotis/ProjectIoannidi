@@ -1,8 +1,11 @@
 CC=g++
 CFLAGS=-std=c++11 -Wall -g3
 
+jsonParser_test: jsonParser.o utilities.o
+	$(CC) $(CFLAGS) jsonParser_test.cpp ../builder/utilities.o ../builder/jsonParser.o -o jsonParser_test
+
 hashtable_test: ../include/hashtable.hpp hashtable_test.cpp utilities.o
-    $(CC) $(CFLAGS) hashtable_test.cpp ../builder/utilities.o -o hashtable_test
+	$(CC) $(CFLAGS) hashtable_test.cpp ../builder/utilities.o -o hashtable_test
 
 avl_test: ../include/avl.hpp avl_test.cpp utilities.o
 	$(CC) $(CFLAGS) avl_test.cpp ../builder/utilities.o -o avl_test
@@ -18,6 +21,9 @@ spec.o: ../include/spec.cpp
 
 utilities.o: ../include/utilities.cpp
 	$(CC) $(CFLAGS) -c ../include/utilities.cpp -o ../builder/utilities.o
+
+jsonParser.o: ../include/jsonParser.cpp ../include/jsonParser.hpp 
+	$(CC) $(CFLAGS) -c ../include/jsonParser.cpp -o ../builder/jsonParser.o
 
 example.o: example.cpp
 	$(CC) $(CFLAGS) -c example.cpp -o ../builder/example.o
