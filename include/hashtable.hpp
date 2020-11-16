@@ -22,7 +22,7 @@ public:
     bool isInside(T* rec);
     bool isInside(std::string testkey);
     void insert(T* rec);
-    T* getSpec(std::string testkey);
+    T* getContentByValue(std::string testkey);
 
     void printAll();
 };
@@ -108,10 +108,10 @@ void hashtable<T>::insert(T* rec) {
 }
 
 template <typename T>
-T* hashtable<T>::getSpec(std::string testkey) {
+T* hashtable<T>::getContentByValue(std::string testkey) {
     unsigned int bucket = hash(testkey);
     if (table[bucket] != NULL)
-        return table[bucket]->getSpec(testkey);
+        return table[bucket]->getContentByValue(testkey);
     else
         return NULL;
 }

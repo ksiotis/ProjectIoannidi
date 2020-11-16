@@ -62,18 +62,8 @@ void read_directory(const string name, hashtable<spec> &hashtab,
     closedir(dirp);
 }
 
-int main() {
-    hashtable<spec> hashtab(5);
-    list<spec> specContainer;
-    list<clique> cliqueContainer;
-
-    read_directory("./Datasets", hashtab, specContainer, cliqueContainer);
-
-    // hashtab.printAll();
-
-
-/********* CSV PART **********/
-    std::ifstream inputFile("Datasets/sigmod_medium_labelled_dataset.csv");
+int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
+    std::ifstream inputFile(csvPath);
     try {
         if (inputFile.is_open() == false) {
             throw "Can't open file!";
@@ -89,53 +79,101 @@ int main() {
                 line.erase(0, id1.length()+1);
 
                 id2 = line.substr(0, line.find(","));
-                // std::cout << id1 << "\t" << id2 << std::endl;
 
                 hashtab.getContentByValue(id1)->merge(hashtab.getContentByValue(id2)); 
             }
         }
+
     }
     catch (const char* e) {
         std::cout << "File Error! " << e << std::endl;
         inputFile.close();
         return -1;
     }
+    return 0;
+}
 
-    //~~~~~~~~debugging~~~~~~~~~~~
+int extractPairs(list<clique> &cliqueContainer, std::string csvOutputFile) {
+    try {
+        //check if output file already exists
+        std::ifstream outfile;
+        outfile.open(csvOutputFile);
+        if (outfile)
+            throw "File already exists!";
 
-    //print pairs -> 3582 lines
-    // listNode<clique> *current = cliqueContainer.getStart();
-    // while (current != NULL) {
-    //     current->getContent()->printPairs();
-    //     current = current->getNext();
-    // }
+        //create output file
+        std::ofstream ofile;
+        ofile.open(csvOutputFile);
+        if (!ofile)
+            throw "Cant't open new file";
 
-    //print all 
+        //write pairs to file
+        listNode<clique> *current = cliqueContainer.getStart();
+        while (current != NULL) {
+            current->getContent()->writePairs(ofile);
+            current = current->getNext();
+        }
+    }
+    catch(const char* e) {
+        std::cerr << e << '\n';
+        return -1;
+    }
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    /*input arguments should be:
+        path to datasets folder
+        path to csv input file
+        path to csv output file
+        number of buckets (default 11)
+    */
+
+    //handle input arguments
+    if (argc < 4) {
+       std::cerr << "Not enough arguments!" << std::endl;
+       return -1;
+    }
+    std::string folder = argv[1];
+    std::string csv_file = argv[2];
+    std::string csvOutputFile = argv[3];
+    int buckets = 11;
+    if (argc == 5) {
+        buckets = atoi(argv[4]);
+        if (buckets <= 0) {
+            std::cerr << "Bucket number should be a positive integer!" << std::endl;
+            return -1;
+        }
+    }
+
+    //initialize container structures
+    hashtable<spec> hashtab(buckets);
+    list<spec> specContainer;
+    list<clique> cliqueContainer;
+
+    //read directories to get ids and add them to the apropriate container structures
+    read_directory(folder, hashtab, specContainer, cliqueContainer);
+
+    //read csv file and reorganize the cliques accordingly
+    if (readCSV(csv_file, hashtab) != 0) {
+        return -1; //if it failed stop
+    }
+    if (extractPairs(cliqueContainer, csvOutputFile) != 0) {
+        return -1; //if it failed stop
+    }
+
     
-
     
-    // while (currentSpec != NULL) {
-    //     if (currentSpec->getContent()->getClique() != targetClique)
-    //         std::cout << "Bad clique: " << currentSpec->getContent()->getId() << std::endl;
-    //     std::cout << currentSpec->getContent()->getId() << std::endl;
-    //     currentSpec = currentSpec->getNext();
-    // }
-    // std::cout << std::endl;
-
+    //json parser example
     jsonParser parser;
-    parser.parse("Datasets/2013_camera_specs/cammarkt.com/390.json");
-    // parser.object.addProperty("1","ass");
-    // parser.object.addProperty("2","ass2");
-    // parser.object.addProperty("3","ass3");
+    jsonObject* json = parser.parse("Datasets/2013_camera_specs/cammarkt.com/390.json");
+    json->print();
 
-    // parser.object.addaray("4");
-    // parser.object.insert("4","4ass1");
-    // parser.object.insert("4","4ass2");
 
-    // std::cout << ((array*)parser.object.content.getContentByValue("4"))->getContent()->getStart()->getContent()->getValue();
-
+    //empty and delete container structures and dynamic data
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);
+    delete json;
 /********* END OF CSV PART **********/
 
 
