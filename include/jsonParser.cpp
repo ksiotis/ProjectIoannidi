@@ -24,6 +24,7 @@ property::property(std::string nkey, std::string nvalue):
 {}
 
 property::property(std::string nvalue):
+    data(nvalue),
     value(nvalue)
 {}
 
@@ -38,9 +39,9 @@ void property::addValue(std::string nvalue) {
 void property::print(int tabs) {
     for (int i = 0; i < tabs; i++)
         std::cout << "\t";
-    if (key != "")
+    if (key != value)
         std::cout << "\"" << key << "\": ";
-    std::cout << value << std::endl;
+    std::cout << "\"" << value << "\"" << std::endl;
 }
 
 //~~~~~~~~~~~~~~array~~~~~~~~~~~~~~~~~

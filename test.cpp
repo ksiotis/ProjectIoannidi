@@ -91,7 +91,7 @@ int main() {
                 id2 = line.substr(0, line.find(","));
                 // std::cout << id1 << "\t" << id2 << std::endl;
 
-                hashtab.getContentByValue(id1)->merge(hashtab.getContentByValue(id2)); 
+                hashtab.getContentByKeyValue(id1)->merge(hashtab.getContentByKeyValue(id2)); 
             }
         }
     }
@@ -132,7 +132,7 @@ int main() {
     // parser.object.insert("4","4ass1");
     // parser.object.insert("4","4ass2");
 
-    // std::cout << ((array*)parser.object.content.getContentByValue("4"))->getContent()->getStart()->getContent()->getValue();
+    // std::cout << ((array*)parser.object.content.getContentByKeyValue("4"))->getContent()->getStart()->getContent()->getValue();
 
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);

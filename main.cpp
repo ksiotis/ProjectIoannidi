@@ -80,7 +80,7 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
 
                 id2 = line.substr(0, line.find(","));
 
-                hashtab.getContentByValue(id1)->merge(hashtab.getContentByValue(id2)); 
+                hashtab.getContentByKeyValue(id1)->merge(hashtab.getContentByKeyValue(id2)); 
             }
         }
 

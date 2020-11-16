@@ -38,7 +38,7 @@ public:
     void emptyList(bool deleteContent);
     bool search(T);
     T *removeStart();
-    T* getContentByValue(std::string testkey);
+    T* getContentByKeyValue(std::string testkey);
 
     static void merge(list<T>& a, list<T>&b);
 };
@@ -163,7 +163,7 @@ T *list<T>::removeStart() {
 }
 
 template <typename T>
-T* list<T>::getContentByValue(std::string testkey) {
+T* list<T>::getContentByKeyValue(std::string testkey) {
 
     listNode<T> *current = start;
     while (current != NULL) {
