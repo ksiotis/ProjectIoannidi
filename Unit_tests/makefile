@@ -1,8 +1,11 @@
 CC=g++
 CFLAGS=-std=c++11 -Wall -g3
 
+spec_test: ../include/list.hpp ../include/spec.hpp spec_test.cpp spec.o utilities.o
+	$(CC) $(CFLAGS) spec_test.cpp ../builder/spec.o ../builder/utilities.o -o spec_test
+
 hashtable_test: ../include/hashtable.hpp hashtable_test.cpp utilities.o
-    $(CC) $(CFLAGS) hashtable_test.cpp ../builder/utilities.o -o hashtable_test
+	$(CC) $(CFLAGS) hashtable_test.cpp ../builder/utilities.o -o hashtable_test
 
 avl_test: ../include/avl.hpp avl_test.cpp utilities.o
 	$(CC) $(CFLAGS) avl_test.cpp ../builder/utilities.o -o avl_test
@@ -23,4 +26,4 @@ example.o: example.cpp
 	$(CC) $(CFLAGS) -c example.cpp -o ../builder/example.o
 
 clean:
-	rm -rf example ../builder/* list_test avl_test hashtable_test
+	rm -rf example ../builder/* list_test avl_test hashtable_test spec_test
