@@ -20,12 +20,22 @@ void test_tree_simple(void){
     TEST_CHECK(tree.isInside("g") == false && tree.isInside("bbbb"));
 }
 
+void test_tree_complex(void){
+    avlTree<unit_testing> tree = avlTree<unit_testing>();
 
+    for(int i = 0; i < 100; i++){
+        unit_testing *a = new unit_testing(std::to_string(i));
+        tree.insert(a);
+    }
+    TEST_CHECK(tree.getCount() == 100);
+    TEST_CHECK(tree.isInside("101") == false && tree.isInside("5"));
+}
 
 
 
 
 TEST_LIST = {
     {"Tree simple test" , test_tree_simple},
+    {"Tree complex test" , test_tree_complex},
 	{ NULL, NULL }
 };
