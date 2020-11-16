@@ -1,6 +1,8 @@
 CC=g++
 CFLAGS=-std=c++11 -Wall -g3
 
+unit_test: spec_test jsonParser_test hashtable_test avl_test list_test
+
 spec_test: ../include/list.hpp ../include/spec.hpp spec_test.cpp spec.o utilities.o
 	$(CC) $(CFLAGS) spec_test.cpp ../builder/spec.o ../builder/utilities.o -o spec_test
 	
@@ -16,9 +18,6 @@ avl_test: ../include/avl.hpp avl_test.cpp utilities.o
 list_test: ../include/list.hpp list_test.cpp
 	$(CC) $(CFLAGS) list_test.cpp -o list_test
 
-example: example.o utilities.o spec.o
-	$(CC) $(CFLAGS) ../builder/example.o  ../builder/spec.o  ../builder/utilities.o -o example
-
 spec.o: ../include/spec.cpp
 	$(CC) $(CFLAGS) -c ../include/spec.cpp -o ../builder/spec.o
 
@@ -32,4 +31,4 @@ example.o: example.cpp
 	$(CC) $(CFLAGS) -c example.cpp -o ../builder/example.o
 
 clean:
-	rm -rf example ../builder/* list_test avl_test hashtable_test spec_test jsonParser_test
+	rm -rf ../builder/* list_test avl_test hashtable_test spec_test jsonParser_test
