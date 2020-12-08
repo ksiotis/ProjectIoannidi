@@ -22,19 +22,23 @@ public:
     void setClique(clique *newClique);
 
     void merge(spec *second);
+    void unsimilar(spec *second);
     void print();
 };
 
 class clique {
 private:
     list<spec> content;
+    list<clique> negative;
 public:
     clique(spec* initialSpec);
     ~clique();
 
     list<spec>* getContentList();
+    list<clique>* getNegativeList();
 
     void merge(clique *second);
+    void addNegative(clique *second);
     void writePairs(std::ofstream &ofile);
 };
 

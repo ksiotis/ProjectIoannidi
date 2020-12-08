@@ -72,15 +72,23 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
         std::string line;
         getline(inputFile, line); //skip first line
         while (getline(inputFile, line)) { //for every line in file
-            if (line.back() == *(char*)"1") {
+            if (line.back() == '1') {// a,b,1
                 //line is ending in 1
                 std::string id1,id2;
                 id1 = line.substr(0, line.find(","));
                 line.erase(0, id1.length()+1);
-
                 id2 = line.substr(0, line.find(","));
 
                 hashtab.getContentByKeyValue(id1)->merge(hashtab.getContentByKeyValue(id2)); 
+            }
+            else if (line.back() == '0') {// a,b,0
+                //line is ending in 0
+                std::string id1,id2;
+                id1 = line.substr(0, line.find(","));
+                line.erase(0, id1.length()+1);
+                id2 = line.substr(0, line.find(","));
+
+                hashtab.getContentByKeyValue(id1)->unsimilar(hashtab.getContentByKeyValue(id2));
             }
         }
 

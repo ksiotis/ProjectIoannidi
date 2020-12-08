@@ -41,6 +41,11 @@ public:
     T* getContentByKeyValue(std::string testkey);
 
     static void merge(list<T>& a, list<T>&b);
+
+    //Part 2
+    bool search(T*);
+    void remove(T*);
+    void remove(T*, T*);
 };
 
 //~~~~~~~~~~~~~~~~~~~listNode~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,6 +149,18 @@ bool list<T>::search(T test) {
 }
 
 template <typename T>
+bool list<T>::search(T *test) {
+//is something equal to test inside?
+    listNode<T> *curr = start;
+    for (int i = 0; i < count; ++i) {
+        if (curr->getContent() == test)
+            return true;
+        curr = curr->getNext();
+    }
+    return false;
+}
+
+template <typename T>
 T *list<T>::removeStart() {
 /*remove the starting node and return its pointer
   used for FIFO*/
@@ -197,6 +214,54 @@ void list<T>::merge(list<T> &a, list<T> &b) {
     b.start = NULL;
     // b.end=NULL;
     // delete b;
+}
+
+template <typename T>
+void list<T>::remove(T* test) {
+    listNode<T> *previous = NULL;
+    listNode<T> *current = start();
+    while (current != NULL) {
+        if (current->getContent() == test) {
+            if (previous != NULL)
+                previous->setNext(current->getNext());
+            else
+                start = current->getNext();
+
+            if (end == current)
+                end = previous;
+            delete current;
+            break;
+        }
+        current = current->getNext();
+    }
+    return;
+}
+
+template <typename T>
+void list<T>::remove(T* test, T* test2) {
+    listNode<T> *previous = NULL;
+    listNode<T> *current = start();
+    char toBeFound = 2;
+    while (toBeFound && current != NULL) {
+        T *testCurr = current->getContent();
+        if (testCurr == test || testCurr == test2) {
+            if (previous != NULL)
+                previous->setNext(current->getNext());
+            else
+                start = current->getNext();
+            if (end == current)
+                end = previous;
+            delete current;
+            toBeFound--;
+        }
+        current = current->getNext();
+    }
+    return;
+}
+
+template <typename T>
+void list<T>::remove(T *test, T *test2) {
+
 }
 
 #endif /* LIST_HPP */
