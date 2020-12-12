@@ -97,10 +97,10 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
                 line.erase(0, id1.length()+1);
                 id2 = line.substr(0, line.find(","));
 
-                //TODO remove
-                if (id1 == "www.ebay.com//25120" || id2 == "www.ebay.com//25120") {
-                    std::cout << "yas";
-                }
+                // //TODO remove
+                // if (id1 == "www.ebay.com//25120" || id2 == "www.ebay.com//25120") {
+                //     std::cout << "yas";
+                // }
 
                 // std::cout << "(2)" << std::endl;
                 hashtab.getContentByKeyValue(id1)->unsimilar(hashtab.getContentByKeyValue(id2));

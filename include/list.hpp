@@ -80,7 +80,7 @@ list<T>::list() {
 template <typename T>
 list<T>::~list() {
     listNode<T> *curr = start;
-    if (start != NULL) {
+    while (curr != NULL) {
         listNode<T> *newcurr = curr->getNext();
         delete curr;
         curr = newcurr;
@@ -130,10 +130,11 @@ void list<T>::emptyList(bool deleteContent) {
         if (deleteContent) {
             delete curr->getContent();
         }
-        curr = curr->getNext();
+        listNode<T> *newcurr = curr->getNext();
+        delete curr;
+        curr = newcurr;
         count--;
     }
-    delete start;
     start = NULL;
 }
 
