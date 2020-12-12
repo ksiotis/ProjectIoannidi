@@ -133,9 +133,6 @@ jsonParser::jsonParser() {}
 jsonParser::~jsonParser() {}
 
 jsonObject* jsonParser::parse(std::string path_to_file) {
-/*
-TODO
-*/
     try {
         object = new jsonObject();
 

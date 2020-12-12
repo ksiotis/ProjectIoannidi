@@ -45,6 +45,10 @@ void spec::unsimilar(spec *second) {
         std::cerr << "Called unsimilar on specs that are similar!" << std::endl;
         return;
     }
+
+    if (id == "www.ebay.com//25120" || second->getId() == "www.ebay.com//25120") {
+        std::cout << "yas";
+    }
     myClique->addNegative(second->getClique());
 }
 
@@ -70,19 +74,26 @@ list<clique>* clique::getNegativeList() { return &negative; }
 void clique::merge(clique *second) {
 /*merges <second> clique into current clique*/
 
-    listNode<spec> *current = second->getContentList()->getStart();
-    while (current != NULL) { //change clique in specs
-        current->getContent()->setClique(this); 
-        current = current->getNext();
-    }
-    list<spec>::merge(content, *(second->getContentList()));
-
     //go to each clique in the mergee(second) and remove the old negative cliques and add the new one
     listNode<clique> *currentListNode = second->getNegativeList()->getStart();
     while (currentListNode != NULL) {
         list<clique> *currentNegativeList = currentListNode->getContent()->getNegativeList();
         currentNegativeList->remove(this, second);
         currentNegativeList->insert(this);
+
+        currentListNode = currentListNode->getNext();
+
+
+        //TODO remove debugging
+        listNode<clique> *tempNode = currentNegativeList->getStart();
+        int i = 0;
+        while (tempNode != NULL) {
+            i++;
+            tempNode = tempNode->getNext();
+        }
+        if (currentNegativeList->getCount() != i) {
+            std::cout << "I WANNA DIE" << std::endl;
+        }
     }
 
     // //go to each clique in the merger(this) and remove the mergee //TODO if things go bad, this is to be uncommented
@@ -97,18 +108,25 @@ void clique::merge(clique *second) {
     while (currentN != NULL) {
         if (!negative.search(currentN->getContent()))
             negative.insert(currentN->getContent());
+        currentN = currentN->getNext();
     }
     
+    listNode<spec> *current = second->getContentList()->getStart();
+    while (current != NULL) { //change clique in specs
+        current->getContent()->setClique(this); 
+        current = current->getNext();
+    }
+    list<spec>::merge(content, *(second->getContentList()));
 }
 
 void clique::addNegative(clique *second) { //TODO clean debuging
-    bool firstInSecond = negative.search(second);
-    bool secondInFirst = second->getNegativeList()->search(this);
+    bool secondInFirst = negative.search(second);
+    bool firstInSecond = second->getNegativeList()->search(this);
 
-    if (!firstInSecond) { //if second is not already inside this
+    if (!secondInFirst) { //if second is not already inside this
         negative.insert(second);
     }
-    if (!secondInFirst) { //if this is not already inside second
+    if (!firstInSecond) { //if this is not already inside second
         second->getNegativeList()->insert(this);
     }
 

@@ -17,7 +17,7 @@ std::string T::* treeNode<T>::keyValue = &spec::id;
 typedef std::string string;
 
 void read_directory(const string name, hashtable<spec> &hashtab, 
-        list<spec> &specContainer, list<clique> &cliqueContainer)
+        list<spec> &specContainer, list<clique> &cliqueContainer, list<jsonObject> &jsonContainer)
 {
     string path = name;
     string path2;
@@ -37,9 +37,11 @@ void read_directory(const string name, hashtable<spec> &hashtab,
         dirp2 = opendir(path2.c_str());
         if(dirp2 != 0){ //if directory read it
             closedir(dirp2);
-            read_directory(path2, hashtab, specContainer, cliqueContainer);
+            read_directory(path2, hashtab, specContainer, cliqueContainer, jsonContainer);
         }else { //if file
-
+            jsonParser parser;
+            std::cout << "jsonContainer insert " << path2 << std::endl;
+            jsonContainer.insert(parser.parse(path2));
             // keep only the last folder + filename
             string delimiter = "/";
 
@@ -51,8 +53,8 @@ void read_directory(const string name, hashtable<spec> &hashtab,
             }
             path2 = token + "//" + path2;
             if((pos = path2.find(".json")) != string::npos){ // Remove .json extension
-                path2.erase(pos,path2.length());
 
+                path2.erase(pos,path2.length());
                 spec *currentSpec = new spec(path2, cliqueContainer);
                 specContainer.insert(currentSpec);
                 hashtab.insert(currentSpec);
@@ -72,6 +74,7 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
         std::string line;
         getline(inputFile, line); //skip first line
         while (getline(inputFile, line)) { //for every line in file
+            std::cout << line;
             if (line.back() == '1') {// a,b,1
                 //line is ending in 1
                 std::string id1,id2;
@@ -79,6 +82,12 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
                 line.erase(0, id1.length()+1);
                 id2 = line.substr(0, line.find(","));
 
+                //TODO remove
+                if (id1 == "www.ebay.com//25120" || id2 == "www.ebay.com//25120") {
+                    std::cout << "yas";
+                }
+
+                std::cout << "(1)" << std::endl;
                 hashtab.getContentByKeyValue(id1)->merge(hashtab.getContentByKeyValue(id2)); 
             }
             else if (line.back() == '0') {// a,b,0
@@ -88,8 +97,16 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
                 line.erase(0, id1.length()+1);
                 id2 = line.substr(0, line.find(","));
 
+                //TODO remove
+                if (id1 == "www.ebay.com//25120" || id2 == "www.ebay.com//25120") {
+                    std::cout << "yas";
+                }
+
+                std::cout << "(2)" << std::endl;
                 hashtab.getContentByKeyValue(id1)->unsimilar(hashtab.getContentByKeyValue(id2));
             }
+            else
+                std::cout << "Bad line: \"" << line << '"' << std::endl;
         }
 
     }
@@ -154,13 +171,15 @@ int main(int argc, char** argv) {
         }
     }
 
+    jsonParser parser;
     //initialize container structures
     hashtable<spec> hashtab(buckets);
     list<spec> specContainer;
     list<clique> cliqueContainer;
+    list<jsonObject> jsonContainer;
 
     //read directories to get ids and add them to the apropriate container structures
-    read_directory(folder, hashtab, specContainer, cliqueContainer);
+    read_directory(folder, hashtab, specContainer, cliqueContainer, jsonContainer);
 
     //read csv file and reorganize the cliques accordingly
     if (readCSV(csv_file, hashtab) != 0) {
@@ -174,6 +193,7 @@ int main(int argc, char** argv) {
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);
+    jsonContainer.emptyList(true);
 /********* END OF CSV PART **********/
 
 

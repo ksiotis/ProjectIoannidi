@@ -152,7 +152,12 @@ template <typename T>
 bool list<T>::search(T *test) {
 //is something equal to test inside?
     listNode<T> *curr = start;
-    for (int i = 0; i < count; ++i) {
+    // for (int i = 0; i < count; ++i) {
+    //     if (curr->getContent() == test)
+    //         return true;
+    //     curr = curr->getNext();
+    // }
+    while (curr != NULL) {
         if (curr->getContent() == test)
             return true;
         curr = curr->getNext();
@@ -212,7 +217,7 @@ void list<T>::merge(list<T> &a, list<T> &b) {
         a.end = b.end;
     b.count=0;
     b.start = NULL;
-    // b.end=NULL;
+    b.end=NULL;
     // delete b;
 }
 
@@ -240,28 +245,31 @@ void list<T>::remove(T* test) {
 template <typename T>
 void list<T>::remove(T* test, T* test2) {
     listNode<T> *previous = NULL;
-    listNode<T> *current = start();
+    listNode<T> *current = start;
     char toBeFound = 2;
-    while (toBeFound && current != NULL) {
+    while (toBeFound && (current != NULL)) {
         T *testCurr = current->getContent();
         if (testCurr == test || testCurr == test2) {
-            if (previous != NULL)
-                previous->setNext(current->getNext());
-            else
+            if (previous == NULL) {
                 start = current->getNext();
+            }
+            else {
+                previous->setNext(current->getNext());
+            }
             if (end == current)
                 end = previous;
-            delete current;
             toBeFound--;
+            count--;
+
+            listNode<T> *newcurrent = current->getNext();
+            delete current;
+            current = newcurrent;
+            continue;
         }
+        previous = current;
         current = current->getNext();
     }
     return;
-}
-
-template <typename T>
-void list<T>::remove(T *test, T *test2) {
-
 }
 
 #endif /* LIST_HPP */
