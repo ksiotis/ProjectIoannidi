@@ -81,9 +81,6 @@ void clique::merge(clique *second) {
         currentNegativeList->remove(this, second);
         currentNegativeList->insert(this);
 
-        currentListNode = currentListNode->getNext();
-
-
         //TODO remove debugging
         listNode<clique> *tempNode = currentNegativeList->getStart();
         int i = 0;
@@ -94,6 +91,8 @@ void clique::merge(clique *second) {
         if (currentNegativeList->getCount() != i) {
             std::cout << "I WANNA DIE" << std::endl;
         }
+
+        currentListNode = currentListNode->getNext();
     }
 
     // //go to each clique in the merger(this) and remove the mergee //TODO if things go bad, this is to be uncommented

@@ -57,10 +57,7 @@ listNode<T>::listNode(T* rec) {
 }
 
 template <typename T>
-listNode<T>::~listNode() {
-    if (next != NULL)
-        delete next;
-}
+listNode<T>::~listNode() {}
 
 template <typename T>
 T* listNode<T>::getContent() { return content; }
@@ -82,8 +79,12 @@ list<T>::list() {
 
 template <typename T>
 list<T>::~list() {
-    if (start != NULL)
-        delete start;
+    listNode<T> *curr = start;
+    if (start != NULL) {
+        listNode<T> *newcurr = curr->getNext();
+        delete curr;
+        curr = newcurr;
+    }
 }
 
 template <typename T>
@@ -234,6 +235,8 @@ void list<T>::remove(T* test) {
 
             if (end == current)
                 end = previous;
+            
+            current->setNext(NULL);
             delete current;
             break;
         }

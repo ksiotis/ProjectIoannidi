@@ -40,7 +40,7 @@ void read_directory(const string name, hashtable<spec> &hashtab,
             read_directory(path2, hashtab, specContainer, cliqueContainer, jsonContainer);
         }else { //if file
             jsonParser parser;
-            std::cout << "jsonContainer insert " << path2 << std::endl;
+            // std::cout << "jsonContainer insert " << path2 << std::endl;
             jsonContainer.insert(parser.parse(path2));
             // keep only the last folder + filename
             string delimiter = "/";
@@ -74,7 +74,7 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
         std::string line;
         getline(inputFile, line); //skip first line
         while (getline(inputFile, line)) { //for every line in file
-            std::cout << line;
+            // std::cout << line;
             if (line.back() == '1') {// a,b,1
                 //line is ending in 1
                 std::string id1,id2;
@@ -82,12 +82,12 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
                 line.erase(0, id1.length()+1);
                 id2 = line.substr(0, line.find(","));
 
-                //TODO remove
-                if (id1 == "www.ebay.com//25120" || id2 == "www.ebay.com//25120") {
-                    std::cout << "yas";
-                }
+                // //TODO remove
+                // if (id1 == "www.ebay.com//25120" || id2 == "www.ebay.com//25120") {
+                //     std::cout << "yas";
+                // }
 
-                std::cout << "(1)" << std::endl;
+                // std::cout << "(1)" << std::endl;
                 hashtab.getContentByKeyValue(id1)->merge(hashtab.getContentByKeyValue(id2)); 
             }
             else if (line.back() == '0') {// a,b,0
@@ -102,7 +102,7 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
                     std::cout << "yas";
                 }
 
-                std::cout << "(2)" << std::endl;
+                // std::cout << "(2)" << std::endl;
                 hashtab.getContentByKeyValue(id1)->unsimilar(hashtab.getContentByKeyValue(id2));
             }
             else
