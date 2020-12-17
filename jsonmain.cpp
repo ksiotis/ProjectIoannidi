@@ -1,6 +1,7 @@
 #include <iostream>
 #include <dirent.h>
 #include <cstring>
+#include <regex>
 #include <sys/types.h>
 #include <fstream>
 #include <sstream>
@@ -15,6 +16,25 @@ std::string T::* treeNode<T>::keyValue = &spec::id;
 
 // using namespace std;
 typedef std::string string;
+
+std::string removeWord(std::string str, std::string word)  
+{ 
+    if (str.find(word) != std::string::npos) 
+    { 
+        size_t p = -1; 
+  
+        std::string tempWord = word + " "; 
+        while ((p = str.find(word)) != std::string::npos) 
+            str.replace(p, tempWord.length(), " "); 
+  
+        tempWord = " " + word; 
+        while ((p = str.find(word)) != std::string::npos) 
+            str.replace(p, tempWord.length(), " "); 
+    } 
+  
+
+    return str; 
+} 
 
 void read_directory(const string name, hashtable<spec> &hashtab, 
         list<spec> &specContainer, list<clique> &cliqueContainer)
@@ -166,11 +186,26 @@ int main(int argc, char** argv) {
     
     //json parser example
     jsonParser parser;
-    jsonObject* json = parser.parse("Datasets/X/cammarkt.com/390.json");
-    
+    jsonObject* json = parser.parse("Datasets/2013_camera_specs/cammarkt.com/390.json");
     // json->print();
-
-
+    std::cout << "wtf1" << std::endl;
+    std::string json_string = json->stringy();
+    std::cout << json_string << std::endl;
+    std::cout << "wtf2" << std::endl;
+    // json_string = removeWord(json_string,".");
+    // json_string = removeWord(json_string,",");
+    // json_string = removeWord(json_string,"/");
+    // json_string = removeWord(json_string,"\n");
+    // json_string = removeWord(json_string,"\\");
+    json_string = std::regex_replace(json_string, std::regex(R"([^A-Za-z ][\\n]*)"), " ");
+    std::string stopwords[119] = {"a","able","about","across","after","all","almost","also","am","among","an","and","any","are","as","at","be","because","been","but","by","can","cannot","could","dear","did","do","does","either","else","ever","every","for","from","get","got","had","has","have","he","her","hers","him","his","how","however","i","if","in","into","is","it","its","just","least","let","like","likely","may","me","might","most","must","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","she","should","since","so","some","than","that","the","their","them","then","there","these","they","this","tis","to","too","twas","us","wants","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","yet","you","your"};
+    for(int i=0; i<119;i++){
+        json_string = std::regex_replace(json_string, std::regex("[^a-zA-Z]("+stopwords[i]+")[^a-zA-Z]"), " ");
+        // json_string = removeWord(json_string,stopwords[i]);
+    }
+    json_string = removeWord(json_string,"  ");
+    
+    std::cout << json_string << std::endl;
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);
@@ -180,3 +215,6 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+
+// std::regex e ("\\[0-9]");
+// std::regex_replace (std::back_inserter(result), s.begin(), s.end(), e, "$2");
