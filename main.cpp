@@ -10,8 +10,8 @@
 #include "include/list.hpp"
 #include "include/jsonParser.hpp"
 
-template <typename T>
-std::string T::* treeNode<T>::keyValue = &spec::id;
+// template <typename T>
+// std::string T::* treeNode<T>::keyValue = &generic::id;
 
 // using namespace std;
 typedef std::string string;

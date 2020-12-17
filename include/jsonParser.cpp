@@ -45,6 +45,10 @@ void property::print(int tabs) {
     std::cout << "\"" << value << "\"" << std::endl;
 }
 
+std::string property::stringy(){
+    return std::string(value) + " ";
+}
+
 //~~~~~~~~~~~~~~array~~~~~~~~~~~~~~~~~
 
 array::array(std::string nkey):
@@ -77,6 +81,17 @@ void array::print(int tabs) {
         std::cout << "\t";
     std::cout << "]\n";
 }
+
+std::string array::stringy(){
+    listNode<property> *current = content.getStart();
+    std::string word="";
+    while (current != NULL) {
+        word += current->getContent()->stringy();
+        current = current->getNext();
+    }
+    return word;
+}
+
 
 //~~~~~~~~~~~~~~jsonObject~~~~~~~~~~~~~~~~~
 
@@ -124,6 +139,16 @@ void jsonObject::print() {
         current = current->getNext();
     }
     std::cout << "}\n";
+}
+
+std::string jsonObject::stringy() {
+    std::string word="";
+    listNode<data> *current = content.getStart();
+    while (current != NULL) {
+        word += current->getContent()->stringy();
+        current = current->getNext();
+    }
+    return word;
 }
 
 //~~~~~~~~~~~~~~jsonParser~~~~~~~~~~~~~~~~~

@@ -93,18 +93,21 @@ void Index::fix_idf(){
 
 //~~~~~~~~~~~~~~~~~~~IndexObject~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-IndexObject::IndexObject(std::string a){
-    id = a;
+IndexObject::IndexObject(std::string a):generic(a) {
     nt = 1;
     dim = -1;
     idf = -0.5;
 }
 
 IndexObject::~IndexObject(){}
-std::string IndexObject::getWord(){ return id;}
+
+std::string IndexObject::getKey(){
+    return id;
+}
 
 void IndexObject::raiseNt(){nt++;}
 int IndexObject::getNt(){return nt;}
+
 
 
 void IndexObject::setDim(int a){dim = a;}
@@ -129,9 +132,7 @@ json_index::~json_index(){
     container->emptyList(true);
 }
 
-std::string json_index::getId(){
-    return id;
-}
+std::string json_index::getKey(){return id;}
 
 void json_index::insert(std::string key){
     json_indexObject *in = new json_indexObject(key);
@@ -167,14 +168,12 @@ float json_index::getTf(std::string key){
 
 //~~~~~~~~~~~~~~~~~~~json_indexObject~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-json_indexObject::json_indexObject(std::string a){
-    id = a;
+json_indexObject::json_indexObject(std::string a):generic(a) {
     count = 1;
     tf = 0;
 }
 
 json_indexObject::~json_indexObject(){}
-std::string json_indexObject::getWord(){ return id;}
 
 void json_indexObject::raiseCount(){count++;}
 int json_indexObject::getCount(){return count;}

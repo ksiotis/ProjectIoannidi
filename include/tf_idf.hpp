@@ -8,19 +8,17 @@
 
 #include "list.hpp"
 #include "hashtable.hpp"
+#include "utilities.hpp"
 
 
-class IndexObject {
+class IndexObject: public generic {
 private:
-    std::string id;
     int nt; // nt as presented in Project's pdf file
     int dim; // dimension
     float idf; 
 public:
     IndexObject(std::string a);
     ~IndexObject();
-    
-    std::string getWord();
 
     void raiseNt();
     int getNt();
@@ -30,6 +28,8 @@ public:
 
     void find_setIdf(int n);
     float getIdf();
+
+    std::string getKey();
 
     // void print();
 };
@@ -65,16 +65,13 @@ public:
 
 //************** INDEX SEPERATION LINE ***************
 
-class json_indexObject {
+class json_indexObject: public generic{
 private:
-    std::string id;
     int count; // number of time word appears inside the specific json
     float tf;
 public:
     json_indexObject(std::string a);
     ~json_indexObject();
-
-    std::string getWord();
 
     void raiseCount();
     int getCount();
@@ -94,7 +91,7 @@ public:
     json_index(std::string name,int buckets);
     ~json_index();
 
-    std::string getId();
+    std::string getKey();
 
     void insert(std::string key);
 
