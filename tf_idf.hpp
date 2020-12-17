@@ -104,4 +104,9 @@ public:
 };
 
 
+void insert_word(Index* index,json_index* json,std::string word);
+
+
+
+
 #endif /* SPEC_HPP */

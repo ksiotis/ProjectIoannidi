@@ -131,6 +131,8 @@ void json_index::fix_Tf(){
         Go to each node of all the avl_nodes
         run find_setTf(words_counter) on each node
     */
+
+
 }
 
 float json_index::getTf(std::string key){
@@ -154,3 +156,19 @@ int json_indexObject::getCount(){return count;}
 
 void json_indexObject::find_setTf(int n){tf = float(count)/n;}
 float json_indexObject::getTf(){return tf;}
+
+
+
+
+void insert_word(Index* index,json_index* json,std::string word){
+    if(json->isInside(word)){
+        json->raiseCount(word);
+    }else{
+        json->insert(word);
+        if(index->isInside(word)){
+            index->raiseNt(word);
+        }else{
+            index->insert(word);
+        }
+    }
+}
