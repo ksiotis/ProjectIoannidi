@@ -1,14 +1,18 @@
 #include <iostream>
 #include <dirent.h>
 #include <cstring>
+#include <regex>
 #include <sys/types.h>
 #include <fstream>
 #include <sstream>
+#include <iomanip>      // std::setprecision
 
 #include "include/spec.hpp"
 #include "include/hashtable.hpp"
 #include "include/list.hpp"
 #include "include/jsonParser.hpp"
+#include "include/tf_idf.hpp"
+#include "include/utilities.hpp"
 
 // template <typename T>
 // std::string T::* treeNode<T>::keyValue = &generic::id;
@@ -16,8 +20,26 @@
 // using namespace std;
 typedef std::string string;
 
+std::string removeWord(std::string str, std::string word)  
+{ 
+    if (str.find(word) != std::string::npos) 
+    { 
+        size_t p = -1; 
+  
+        std::string tempWord = word + " "; 
+        while ((p = str.find(word)) != std::string::npos) 
+            str.replace(p, tempWord.length(), " "); 
+  
+        tempWord = " " + word; 
+        while ((p = str.find(word)) != std::string::npos) 
+            str.replace(p, tempWord.length(), " "); 
+    }
+
+    return str; 
+} 
+
 void read_directory(const string name, hashtable<spec> &hashtab, 
-        list<spec> &specContainer, list<clique> &cliqueContainer, list<jsonObject> &jsonContainer)
+        list<spec> &specContainer, list<clique> &cliqueContainer)
 {
     string path = name;
     string path2;
@@ -37,11 +59,9 @@ void read_directory(const string name, hashtable<spec> &hashtab,
         dirp2 = opendir(path2.c_str());
         if(dirp2 != 0){ //if directory read it
             closedir(dirp2);
-            read_directory(path2, hashtab, specContainer, cliqueContainer, jsonContainer);
+            read_directory(path2, hashtab, specContainer, cliqueContainer);
         }else { //if file
-            jsonParser parser;
-            // std::cout << "jsonContainer insert " << path2 << std::endl;
-            jsonContainer.insert(parser.parse(path2));
+
             // keep only the last folder + filename
             string delimiter = "/";
 
@@ -53,8 +73,8 @@ void read_directory(const string name, hashtable<spec> &hashtab,
             }
             path2 = token + "//" + path2;
             if((pos = path2.find(".json")) != string::npos){ // Remove .json extension
-
                 path2.erase(pos,path2.length());
+
                 spec *currentSpec = new spec(path2, cliqueContainer);
                 specContainer.insert(currentSpec);
                 hashtab.insert(currentSpec);
@@ -74,39 +94,16 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
         std::string line;
         getline(inputFile, line); //skip first line
         while (getline(inputFile, line)) { //for every line in file
-            // std::cout << line;
-            if (line.back() == '1') {// a,b,1
+            if (line.back() == *(char*)"1") {
                 //line is ending in 1
                 std::string id1,id2;
                 id1 = line.substr(0, line.find(","));
                 line.erase(0, id1.length()+1);
+
                 id2 = line.substr(0, line.find(","));
 
-                // //TODO remove
-                // if (id1 == "www.ebay.com//25120" || id2 == "www.ebay.com//25120") {
-                //     std::cout << "yas";
-                // }
-
-                // std::cout << "(1)" << std::endl;
                 hashtab.getContentByKeyValue(id1)->merge(hashtab.getContentByKeyValue(id2)); 
             }
-            else if (line.back() == '0') {// a,b,0
-                //line is ending in 0
-                std::string id1,id2;
-                id1 = line.substr(0, line.find(","));
-                line.erase(0, id1.length()+1);
-                id2 = line.substr(0, line.find(","));
-
-                // //TODO remove
-                // if (id1 == "www.ebay.com//25120" || id2 == "www.ebay.com//25120") {
-                //     std::cout << "yas";
-                // }
-
-                // std::cout << "(2)" << std::endl;
-                hashtab.getContentByKeyValue(id1)->unsimilar(hashtab.getContentByKeyValue(id2));
-            }
-            else
-                std::cout << "Bad line: \"" << line << '"' << std::endl;
         }
 
     }
@@ -171,31 +168,100 @@ int main(int argc, char** argv) {
         }
     }
 
-    jsonParser parser;
     //initialize container structures
     hashtable<spec> hashtab(buckets);
     list<spec> specContainer;
     list<clique> cliqueContainer;
-    list<jsonObject> jsonContainer;
 
     //read directories to get ids and add them to the apropriate container structures
-    read_directory(folder, hashtab, specContainer, cliqueContainer, jsonContainer);
+    read_directory(folder, hashtab, specContainer, cliqueContainer);
 
     //read csv file and reorganize the cliques accordingly
     if (readCSV(csv_file, hashtab) != 0) {
         return -1; //if it failed stop
     }
-    //out pairs to file
     if (extractPairs(cliqueContainer, csvOutputFile) != 0) {
         return -1; //if it failed stop
     }
 
+    
+    Index index = Index(buckets);
+    json_index j_index = json_index("cammarkt.com//390.json",buckets);
+    
+    //json parser example
+    jsonParser parser;
+    jsonObject* json = parser.parse("Datasets/2013_camera_specs/cammarkt.com/390.json");
+
+    std::string json_string = json->stringy();
+
+    json_string = std::regex_replace(json_string, std::regex(R"([^A-Za-z ][\\n]*)"), " ");
+    std::string stopwords[119] = {"a","able","about","across","after","all","almost","also","am","among","an","and","any","are","as","at","be","because","been","but","by","can","cannot","could","dear","did","do","does","either","else","ever","every","for","from","get","got","had","has","have","he","her","hers","him","his","how","however","i","if","in","into","is","it","its","just","least","let","like","likely","may","me","might","most","must","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","she","should","since","so","some","than","that","the","their","them","then","there","these","they","this","tis","to","too","twas","us","wants","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","yet","you","your"};
+    for(int i=0; i<119;i++){
+        json_string = std::regex_replace(json_string, std::regex("[^a-zA-Z]("+stopwords[i]+")[^a-zA-Z]"), " ");
+    }
+    json_string = removeWord(json_string,"  ");
+
+
+    std::string temp_word_for_test = "cat cat ha";
+    std::stringstream ss(json_string);
+    
+    string buf;
+    while (ss >> buf){
+        insert_word(&index,&j_index,buf);
+    }
+    ss.clear();
+    j_index.fix_Tf();
+
+
+    json_index j2_index = json_index("test",buckets);
+    temp_word_for_test = "ha dog";
+    ss.str(temp_word_for_test);
+    while (ss >> buf){
+        insert_word(&index,&j2_index,buf);
+    }
+    ss.clear();
+    j2_index.fix_Tf();
+
+
+    index.fix_idf(2); // num of json_files
+    index.fix_dim();
+
+
+    int vec_size = index.get_words_counter();
+    float vec[vec_size];
+    for(int i=0;i<vec_size;i++){
+        vec[i] = 0;
+    }
+
+
+
+    get_vector_tfidf(&index,&j_index,vec);
+    for(int i=0;i<vec_size;i++){
+        std::cout << vec[i] << ", ";
+    }
+    std::cout << std::endl;
+
+
+    std::cout << "One is down" << std::endl;
+    for(int i=0;i<vec_size;i++){
+        vec[i] = 0;
+    }
+    get_vector_tfidf(&index,&j2_index,vec);
+    for(int i=0;i<vec_size;i++){
+        std::cout << vec[i] << ", ";
+    }
+    std::cout << std::endl;
+
+    // std::cout << json_string << std::endl;
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);
-    jsonContainer.emptyList(true);
+    delete json;
 /********* END OF CSV PART **********/
 
 
     return 0;
 }
+
+// std::regex e ("\\[0-9]");
+// std::regex_replace (std::back_inserter(result), s.begin(), s.end(), e, "$2");

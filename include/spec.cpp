@@ -2,15 +2,15 @@
 
 //~~~~~~~spec~~~~~~~~
 
-spec::spec(std::string a, list<clique> &cliqueContainer) {
-    id = a;
+spec::spec(std::string a, list<clique> &cliqueContainer)
+:generic(a) {
     myClique = new clique(this);
     cliqueContainer.insert(myClique);
 }
 
 spec::~spec() {}
 
-std::string spec::getId() { return id; }
+// std::string spec::getId() { return id; }
 
 clique* spec::getClique() { return myClique; }
 

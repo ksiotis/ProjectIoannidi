@@ -6,18 +6,19 @@
 #include <fstream>
 
 #include "list.hpp"
+#include "utilities.hpp"
 
 class clique;
 
-class spec {
+class spec: public generic{
 private:
-    std::string id;
+    // std::string id;
     clique *myClique;
 public:
     spec(std::string a, list<clique> &cliqueContainer);
     ~spec();
     
-    std::string getId();
+    // virtual std::string getId();
     clique* getClique();
     void setClique(clique *newClique);
 

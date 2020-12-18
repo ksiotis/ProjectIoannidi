@@ -1,3 +1,5 @@
+//LINE 49
+
 #include <iostream>
 #include <dirent.h>
 #include <cstring>
@@ -6,6 +8,7 @@
 #include <sstream>
 
 #include "include/spec.hpp"
+#include "tf_idf.hpp"
 #include "include/hashtable.hpp"
 #include "include/list.hpp"
 #include "include/jsonParser.hpp"
@@ -17,7 +20,8 @@ std::string T::* treeNode<T>::keyValue = &spec::id;
 typedef std::string string;
 
 void read_directory(const string name, hashtable<spec> &hashtab, 
-        list<spec> &specContainer, list<clique> &cliqueContainer)
+        list<spec> &specContainer, list<clique> &cliqueContainer,
+        hashtable<Index> &index, list<Index> &indexContainer)
 {
     string path = name;
     string path2;
@@ -37,13 +41,20 @@ void read_directory(const string name, hashtable<spec> &hashtab,
         dirp2 = opendir(path2.c_str());
         if(dirp2 != 0){ //if directory read it
             closedir(dirp2);
-            read_directory(path2, hashtab, specContainer, cliqueContainer);
+            read_directory(path2, hashtab, specContainer, cliqueContainer, index, indexContainer);
         }else { //if file
+
+            size_t pos = 0;
+            if((pos = path2.find(".json")) != string::npos){ // if .sjon found
+                jsonParser parser;
+                jsonObject* json = parser.parse(path2);
+                
+                
+            }
 
             // keep only the last folder + filename
             string delimiter = "/";
 
-            size_t pos = 0;
             string token;
             while ((pos = path2.find(delimiter)) != string::npos) {
                 token = path2.substr(0, pos);
@@ -123,10 +134,10 @@ int extractPairs(list<clique> &cliqueContainer, std::string csvOutputFile) {
 
 int main(int argc, char** argv) {
     /*input arguments should be:
-        path to datasets folder
-        path to csv input file
-        path to csv output file
-        number of buckets (default 11)
+    path to datasets folder
+    path to csv input file
+    path to csv output file
+    number of buckets (default 11)
     */
 
     //handle input arguments
@@ -148,32 +159,29 @@ int main(int argc, char** argv) {
 
     //initialize container structures
     hashtable<spec> hashtab(buckets);
+    hashtable<Index> index(buckets);
+    list<Index> indexContainer;
     list<spec> specContainer;
     list<clique> cliqueContainer;
 
     //read directories to get ids and add them to the apropriate container structures
-    read_directory(folder, hashtab, specContainer, cliqueContainer);
+    read_directory(folder, hashtab, specContainer, cliqueContainer , index , indexContainer);
 
-    //read csv file and reorganize the cliques accordingly
-    if (readCSV(csv_file, hashtab) != 0) {
-        return -1; //if it failed stop
-    }
-    if (extractPairs(cliqueContainer, csvOutputFile) != 0) {
-        return -1; //if it failed stop
-    }
 
-    
-    
-    //json parser example
-    jsonParser parser;
-    jsonObject* json = parser.parse("Datasets/2013_camera_specs/cammarkt.com/390.json");
-    json->print();
 
+
+    // //read csv file and reorganize the cliques accordingly
+    // if (readCSV(csv_file, hashtab) != 0) {
+    //     return -1; //if it failed stop
+    // }
+    // //out pairs to file
+    // if (extractPairs(cliqueContainer, csvOutputFile) != 0) {
+    //     return -1; //if it failed stop
+    // }
 
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);
-    delete json;
 /********* END OF CSV PART **********/
 
 

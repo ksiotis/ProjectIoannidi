@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "list.hpp"
+#include "utilities.hpp"
 // #include <avl.hpp>
 
 class data {
@@ -20,6 +21,7 @@ public:
     void setKey(std::string nkey);
     virtual void addValue(std::string value) {};
     virtual void print(int tabs) {};
+    virtual std::string stringy() {return std::string("lol"); };
 };
 //~~~~~~~~~~~~
 class property: public data {
@@ -33,6 +35,7 @@ public:
     std::string getValue();
     void addValue(std::string nvalue);
     virtual void print(int tabs);
+    virtual std::string stringy();
 };
 //~~~~~~~~~~~~
 class array: public data {
@@ -45,6 +48,7 @@ public:
     list<property>* getContent();
     void addValue(std::string nvalue);
     virtual void print(int tabs);
+    virtual std::string stringy();
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -60,6 +64,7 @@ public:
     void insert(std::string key, std::string value);
     void addProperty(std::string key, std::string value);
     void print();
+    std::string stringy();
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -12,7 +12,7 @@ private:
     treeNode* right;
     int height;
 public:
-    static std::string T::* keyValue;
+    // static std::string T::* getId();
     
     treeNode(T* rec);
     ~treeNode();
@@ -53,6 +53,9 @@ public:
     
     treeNode<T>* insert(T* rec);
     void printTree();
+
+    //part 2
+    treeNode<T> *getRoot();
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~treeNode~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,7 +75,7 @@ treeNode<T>::~treeNode() {
 }
 
 template <typename T>
-std::string treeNode<T>::getKey() { return content->*keyValue; }
+std::string treeNode<T>::getKey() { return content->getId(); }
 
 template <typename T>
 int treeNode<T>::getHeight() { return height; }
@@ -125,9 +128,9 @@ treeNode<T>* treeNode<T>::rotateRight() {
 template <typename T>
 treeNode<T>* treeNode<T>::insert(T* rec) {
     //a reccursive implementation of the basic avl tree insert and balancing
-    std::string tkey = rec->*keyValue;
+    std::string tkey = rec->getId();
     treeNode* parent = this;
-    int comparison = tkey.compare(content->*keyValue);
+    int comparison = tkey.compare(content->getId());
 
     // if (comparison == 0) { //if rec is supposed to be here
     //     content.insert(rec);
@@ -262,14 +265,14 @@ bool avlTree<T>::isInside(std::string testkey) {
 template <typename T>
 bool avlTree<T>::isInside(T* rec) {
 /* is something equal to the key of rec in the tree?
-treeNode<T>::keyValue is required to be set to the key of rec*/
-    std::string mykey = (*rec).*(treeNode<T>::keyValue);
+treeNode<T>::getId() is required to be set to the key of rec*/
+    std::string mykey = rec->getId();
     return isInside(mykey);
 }
 
 template <typename T>
 T* avlTree<T>::getContentByKeyValue(std::string testkey) {
-/*get pointer to item with keyValue of testkey
+/*get pointer to item with getId() of testkey
   item must have function getKey*/
     if (root != NULL)
         return root->getContentByKeyValue(testkey);
@@ -285,5 +288,9 @@ void avlTree<T>::printTree() {
     else
         std::cout << "Tree is empty." << count << std::endl;
 }
+
+template <typename T>
+treeNode<T> *avlTree<T>::getRoot() { return root; }
+
 
 #endif /* AVL_HPP */

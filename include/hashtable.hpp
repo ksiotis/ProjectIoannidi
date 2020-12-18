@@ -12,9 +12,9 @@ private:
     unsigned int hash(T* rec);
     unsigned int hash(std::string temp);
 public:
-    std::string T::*key;
+    // std::string T::*key;
     /*pointer to data member of T, which is a string
-    gets its value from treeNode<T>::keyValue*/
+    gets its value from treeNode<T>::getId()*/
 
     hashtable(int buckets);
     ~hashtable();
@@ -27,13 +27,17 @@ public:
     T* getContentByKeyValue(std::string testkey);
 
     void printAll();
+
+    //part 2
+    avlTree<T>* getTree(int i);
+
 };
 
 template <typename T>
 unsigned int hashtable<T>::hash(T* rec) {
 /*return the hashed value of key in rec
 requires this->key to be set to key field in typeof(rec)*/
-    std::string temp = (*rec).*key;
+    std::string temp = rec->getId();
     return hash(temp);
 }
 
@@ -49,7 +53,7 @@ unsigned int hashtable<T>::hash(std::string temp) {
 
 template <typename T>
 hashtable<T>::hashtable(int buckets) {
-    key = treeNode<T>::keyValue;
+    // key = treeNode<T>::getId();
     bucketNumber = buckets;
     table = new avlTree<T>*[bucketNumber];
     for (int i = 0; i < bucketNumber; i++) {
@@ -105,7 +109,7 @@ void hashtable<T>::insert(T* rec) {
   if it exists => displays error,
   if not => inserts rec to the avl tree of apropriate bucket*/
     if (isInside(rec)) { //if keyvalue is already in a bucket...
-        std::cout << "Attempted to insert identical id: " << (*rec).*key << std::endl;
+        std::cout << "Attempted to insert identical id: " << rec->getId() << std::endl;
     }
     else { //if keyvalue is not in a bucket
         unsigned int bucket = hash(rec);
@@ -117,7 +121,7 @@ void hashtable<T>::insert(T* rec) {
 
 template <typename T>
 T* hashtable<T>::getContentByKeyValue(std::string testkey) {
-/*get pointer to item with keyValue of testkey
+/*get pointer to item with getId() of testkey
   item must have function getKey*/
     unsigned int bucket = hash(testkey);
     if (table[bucket] != NULL)
@@ -137,6 +141,11 @@ void hashtable<T>::printAll() {
             std::cout << "Empty" << std::endl;
         std::cout << "---------------------" << std::endl;
     }
+}
+
+template <typename T>
+avlTree<T>* hashtable<T>::getTree(int i) {
+    return table[i];
 }
 
 #endif /* HASHTABLE_HPP */
