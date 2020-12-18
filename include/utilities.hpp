@@ -4,6 +4,8 @@
 #include <string>
 
 int max(int first, int second);
+std::string id_to_path(std::string id,std::string folder);
+
 
 class unit_testing {
     public:

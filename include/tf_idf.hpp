@@ -114,5 +114,4 @@ void insert_word(Index* index,json_index* json,std::string word);
 void get_vector_tfidf(Index* index,json_index* json,float* vec);
 
 
-
 #endif /* SPEC_HPP */

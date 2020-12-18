@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include "matrix.hpp"
 
 matrix::matrix(int row, int column) {
@@ -7,6 +8,7 @@ matrix::matrix(int row, int column) {
     table = new float *[row];
     for (int i = 0; i < row; i++) {
         table[i] = new float[column];
+        memset(table[i], 0, sizeof(float) * column);
     }
 }
 

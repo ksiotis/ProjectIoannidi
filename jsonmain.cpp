@@ -205,7 +205,7 @@ int main(int argc, char** argv) {
     std::string temp_word_for_test = "cat cat ha";
     std::stringstream ss(json_string);
     
-    string buf;
+    std::string buf;
     while (ss >> buf){
         insert_word(&index,&j_index,buf);
     }

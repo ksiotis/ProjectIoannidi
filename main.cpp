@@ -196,6 +196,6 @@ int main(int argc, char** argv) {
     jsonContainer.emptyList(true);
 /********* END OF CSV PART **********/
 
-
+    std::cout << id_to_path("buy.net//6145",folder+"camera_specs_2013/") << std::endl;
     return 0;
 }
