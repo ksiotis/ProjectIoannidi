@@ -46,11 +46,10 @@ int Index::getDim(std::string key){
     return hash->getContentByKeyValue(key)->getDim();
 }
 
-int Index::getIdf(std::string key){
+float Index::getIdf(std::string key){
     return hash->getContentByKeyValue(key)->getIdf();
 }
 
-//TODO ********************************************************************************************************
 void fix_dim_recursive(treeNode<IndexObject> *currentNode, int &counter) {
     treeNode<IndexObject> *left = currentNode->getLeft();
     treeNode<IndexObject> *right = currentNode->getRight();
@@ -77,19 +76,31 @@ void Index::fix_dim(){
     int buckets = hash->getBucketNumber();
     for (int i = 0; i < buckets; i++) {
         avlTree<IndexObject> *currentTree = hash->getTree(i);
-        fix_dim_recursive(currentTree->getRoot(), counter);
+        if(currentTree != NULL) {
+            fix_dim_recursive(currentTree->getRoot(), counter);
+        }
     }
 
 }
 
-//TODO ********************************************************************************************************
-void Index::fix_idf(){
+void Index::fix_idf(int n){
     listNode<IndexObject> *current = container->getStart();
     while (current != NULL) {
-        current->getContent()->find_setIdf(words_counter);
+        current->getContent()->find_setIdf(n);
         current = current->getNext();
     }
 }
+
+float Index::getAverageIdf(){
+    listNode<IndexObject> *current = container->getStart();
+    float avg=0.0;
+    while (current != NULL) {
+        avg += current->getContent()->getIdf();
+        current = current->getNext();
+    }
+    return avg/words_counter;
+}
+
 
 //~~~~~~~~~~~~~~~~~~~IndexObject~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -132,6 +143,10 @@ json_index::~json_index(){
     container->emptyList(true);
 }
 
+list<json_indexObject>* json_index::get_container(){ 
+    return container; 
+}
+
 std::string json_index::getKey(){return id;}
 
 void json_index::insert(std::string key){
@@ -147,6 +162,7 @@ bool json_index::isInside(std::string key){
 
 void json_index::raiseCount(std::string key){
     words_counter++;
+    hash->getContentByKeyValue(key)->raiseCount();
 }
 
 int json_index::getCount(std::string key){
@@ -194,5 +210,21 @@ void insert_word(Index* index,json_index* json,std::string word){
         }else{
             index->insert(word);
         }
+    }
+}
+
+void get_vector_tfidf(Index* index,json_index* json,float* vec){
+    
+
+    std::string word;
+    int dimension;
+    listNode<json_indexObject> *current = json->get_container()->getStart();
+    while (current != NULL) {
+        word = current->getContent()->getId();
+        std::cout << word;
+        dimension = index->getDim(word);
+        // std::cout << " dim: " << dimension << ", count:  " << current->getContent()->getCount() << ", idf: " << index->getIdf(word) << std::endl;
+        vec[dimension] = current->getContent()->getTf() * index->getIdf(word);
+        current = current->getNext();
     }
 }

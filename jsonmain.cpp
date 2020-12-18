@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <fstream>
 #include <sstream>
+#include <iomanip>      // std::setprecision
 
 #include "include/spec.hpp"
 #include "include/hashtable.hpp"
@@ -200,16 +201,57 @@ int main(int argc, char** argv) {
     }
     json_string = removeWord(json_string,"  ");
 
-    std::stringstream ss(json_string);
-    string buf;
 
-    int counter = 0;
+    std::string temp_word_for_test = "cat cat ha";
+    std::stringstream ss(json_string);
+    
+    string buf;
     while (ss >> buf){
-        std::cout << buf << std::endl;
         insert_word(&index,&j_index,buf);
-        counter++;
     }
-    std::cout << counter << "   THAT JSON HAS WORDS :P  " << index.get_words_counter() << std::endl;
+    ss.clear();
+    j_index.fix_Tf();
+
+
+    json_index j2_index = json_index("test",buckets);
+    temp_word_for_test = "ha dog";
+    ss.str(temp_word_for_test);
+    while (ss >> buf){
+        insert_word(&index,&j2_index,buf);
+    }
+    ss.clear();
+    j2_index.fix_Tf();
+
+
+    index.fix_idf(2); // num of json_files
+    index.fix_dim();
+
+
+    int vec_size = index.get_words_counter();
+    float vec[vec_size];
+    for(int i=0;i<vec_size;i++){
+        vec[i] = 0;
+    }
+
+
+
+    get_vector_tfidf(&index,&j_index,vec);
+    for(int i=0;i<vec_size;i++){
+        std::cout << vec[i] << ", ";
+    }
+    std::cout << std::endl;
+
+
+    std::cout << "One is down" << std::endl;
+    for(int i=0;i<vec_size;i++){
+        vec[i] = 0;
+    }
+    get_vector_tfidf(&index,&j2_index,vec);
+    for(int i=0;i<vec_size;i++){
+        std::cout << vec[i] << ", ";
+    }
+    std::cout << std::endl;
+
     // std::cout << json_string << std::endl;
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);

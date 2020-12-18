@@ -45,6 +45,7 @@ public:
 
     unsigned int get_words_counter();
 
+
     void insert(std::string key);
 
     bool isInside(std::string key);
@@ -52,12 +53,13 @@ public:
     void raiseNt(std::string key);
     int getNt(std::string key);
 
-    void fix_dim(); // TODO
+    void fix_dim();
     int getDim(std::string key);
 
-    void fix_idf(); // TODO
-    int getIdf(std::string key);
+    void fix_idf(int n);
+    float getIdf(std::string key);
 
+    float getAverageIdf();
 
 };
 
@@ -92,6 +94,8 @@ public:
     ~json_index();
 
     std::string getKey();
+    list<json_indexObject>* get_container();
+
 
     void insert(std::string key);
 
@@ -107,7 +111,7 @@ public:
 
 
 void insert_word(Index* index,json_index* json,std::string word);
-
+void get_vector_tfidf(Index* index,json_index* json,float* vec);
 
 
 
