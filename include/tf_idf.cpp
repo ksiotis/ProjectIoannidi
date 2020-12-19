@@ -21,6 +21,8 @@ Index::Index(int buckets){
 
 Index::~Index(){
     container->emptyList(true);
+    delete container;
+    delete hash;
 }
 
 unsigned int Index::get_words_counter(){
@@ -144,6 +146,8 @@ json_index::json_index(std::string name,int buckets):generic(name){
 
 json_index::~json_index(){
     container->emptyList(true);
+    delete container;
+    delete hash;
 }
 
 list<json_indexObject>* json_index::get_container(){ 
