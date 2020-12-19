@@ -13,6 +13,25 @@ std::string id_to_path(std::string id, std::string folder){
     return folder+id+".json";
 }
 
+std::string removeWord(std::string str, std::string word)  
+{ 
+    if (str.find(word) != std::string::npos) 
+    { 
+        size_t p = -1; 
+  
+        std::string tempWord = word + " "; 
+        while ((p = str.find(word)) != std::string::npos) 
+            str.replace(p, tempWord.length(), " "); 
+  
+        tempWord = " " + word; 
+        while ((p = str.find(word)) != std::string::npos) 
+            str.replace(p, tempWord.length(), " "); 
+    }
+
+    return str; 
+} 
+
+
 
 unit_testing::unit_testing(std::string x){
         id = x;

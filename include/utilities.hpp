@@ -5,7 +5,7 @@
 
 int max(int first, int second);
 std::string id_to_path(std::string id,std::string folder);
-
+std::string removeWord(std::string str, std::string word);
 
 class unit_testing {
     public:

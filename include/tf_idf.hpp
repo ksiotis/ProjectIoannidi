@@ -9,6 +9,7 @@
 #include "list.hpp"
 #include "hashtable.hpp"
 #include "utilities.hpp"
+#include "jsonParser.hpp"
 
 
 class IndexObject: public generic {
@@ -83,9 +84,8 @@ public:
 
 };
 
-class json_index {
+class json_index: public generic{
 private:
-    std::string id;
     hashtable<json_indexObject> *hash;
     list<json_indexObject> *container;
     unsigned int words_counter;
@@ -93,7 +93,6 @@ public:
     json_index(std::string name,int buckets);
     ~json_index();
 
-    std::string getKey();
     list<json_indexObject>* get_container();
 
 
@@ -112,6 +111,7 @@ public:
 
 void insert_word(Index* index,json_index* json,std::string word);
 void get_vector_tfidf(Index* index,json_index* json,float* vec);
-
+void make_get_vector_tfidf(Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string id,std::string path,float* vec);
+int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets);
 
 #endif /* SPEC_HPP */

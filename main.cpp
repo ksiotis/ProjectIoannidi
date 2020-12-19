@@ -9,6 +9,7 @@
 #include "include/hashtable.hpp"
 #include "include/list.hpp"
 #include "include/jsonParser.hpp"
+#include "include/tf_idf.hpp"
 
 // template <typename T>
 // std::string T::* treeNode<T>::keyValue = &generic::id;
@@ -17,7 +18,7 @@
 typedef std::string string;
 
 void read_directory(const string name, hashtable<spec> &hashtab, 
-        list<spec> &specContainer, list<clique> &cliqueContainer, list<jsonObject> &jsonContainer)
+        list<spec> &specContainer, list<clique> &cliqueContainer)
 {
     string path = name;
     string path2;
@@ -37,11 +38,8 @@ void read_directory(const string name, hashtable<spec> &hashtab,
         dirp2 = opendir(path2.c_str());
         if(dirp2 != 0){ //if directory read it
             closedir(dirp2);
-            read_directory(path2, hashtab, specContainer, cliqueContainer, jsonContainer);
+            read_directory(path2, hashtab, specContainer, cliqueContainer);
         }else { //if file
-            jsonParser parser;
-            // std::cout << "jsonContainer insert " << path2 << std::endl;
-            jsonContainer.insert(parser.parse(path2));
             // keep only the last folder + filename
             string delimiter = "/";
 
@@ -176,15 +174,25 @@ int main(int argc, char** argv) {
     hashtable<spec> hashtab(buckets);
     list<spec> specContainer;
     list<clique> cliqueContainer;
-    list<jsonObject> jsonContainer;
 
     //read directories to get ids and add them to the apropriate container structures
-    read_directory(folder, hashtab, specContainer, cliqueContainer, jsonContainer);
+    read_directory(folder, hashtab, specContainer, cliqueContainer);
 
     //read csv file and reorganize the cliques accordingly
     if (readCSV(csv_file, hashtab) != 0) {
         return -1; //if it failed stop
     }
+
+    std::cout << "oof" << std::endl;
+    Index index(buckets);
+    hashtable<json_index> json_index_hashtable(buckets);
+    list<json_index> json_index_container;
+    list<jsonObject> jsonContainer;
+    if(make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets) != 0){
+        return -2;
+    }
+    std::cout << "oof" << std::endl;
+
     //out pairs to file
     if (extractPairs(cliqueContainer, csvOutputFile) != 0) {
         return -1; //if it failed stop
@@ -194,8 +202,7 @@ int main(int argc, char** argv) {
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);
     jsonContainer.emptyList(true);
+    json_index_container.emptyList(true);
 /********* END OF CSV PART **********/
-
-    std::cout << id_to_path("buy.net//6145",folder+"camera_specs_2013/") << std::endl;
     return 0;
 }

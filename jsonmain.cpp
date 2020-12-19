@@ -20,23 +20,7 @@
 // using namespace std;
 typedef std::string string;
 
-std::string removeWord(std::string str, std::string word)  
-{ 
-    if (str.find(word) != std::string::npos) 
-    { 
-        size_t p = -1; 
-  
-        std::string tempWord = word + " "; 
-        while ((p = str.find(word)) != std::string::npos) 
-            str.replace(p, tempWord.length(), " "); 
-  
-        tempWord = " " + word; 
-        while ((p = str.find(word)) != std::string::npos) 
-            str.replace(p, tempWord.length(), " "); 
-    }
 
-    return str; 
-} 
 
 void read_directory(const string name, hashtable<spec> &hashtab, 
         list<spec> &specContainer, list<clique> &cliqueContainer)

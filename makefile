@@ -2,8 +2,8 @@
 CC=g++
 CFLAGS=-std=c++11 -Wall -g3
 
-main: utilities.o spec.o jsonParser.o
-	$(CC) $(CFLAGS) main.cpp ./builder/utilities.o ./builder/spec.o ./builder/jsonParser.o -o master.out
+main: utilities.o spec.o jsonParser.o tf_idf.o
+	$(CC) $(CFLAGS) main.cpp ./builder/utilities.o ./builder/spec.o ./builder/jsonParser.o ./builder/tf_idf.o -o master.out
 
 utilities.o: ./include/utilities.cpp ./include/utilities.hpp
 	$(CC) $(CFLAGS) -c ./include/utilities.cpp -o ./builder/utilities.o
