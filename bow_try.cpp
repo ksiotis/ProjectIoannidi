@@ -104,7 +104,35 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
     return 0;
 }
 
-int extractPairs(list<clique> &cliqueContainer, std::string csvOutputFile) {
+int extractPositivePairs(list<clique> &cliqueContainer, std::string csvOutputFile) {
+    try {
+        //check if output file already exists
+        std::ifstream outfile;
+        outfile.open(csvOutputFile);
+        if (outfile)
+            throw "File already exists!";
+
+        //create output file
+        std::ofstream ofile;
+        ofile.open(csvOutputFile);
+        if (!ofile)
+            throw "Cant't open new file";
+
+        //write pairs to file
+        listNode<clique> *current = cliqueContainer.getStart();
+        while (current != NULL) {
+            current->getContent()->writePairs(ofile);
+            current = current->getNext();
+        }
+    }
+    catch(const char* e) {
+        std::cerr << e << '\n';
+        return -1;
+    }
+    return 0;
+}
+
+int extractNegativePairs(list<clique> &cliqueContainer, std::string csvOutputFile) {
     try {
         //check if output file already exists
         std::ifstream outfile;
@@ -175,7 +203,7 @@ int main(int argc, char** argv) {
     //     return -1; //if it failed stop
     // }
     // //out pairs to file
-    // if (extractPairs(cliqueContainer, csvOutputFile) != 0) {
+    // if (extractPositivePairs(cliqueContainer, csvOutputFile) != 0) {
     //     return -1; //if it failed stop
     // }
 

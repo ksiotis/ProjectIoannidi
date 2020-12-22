@@ -20,8 +20,8 @@ float logistic_regression::sigmoid(float x) {
 logistic_regression::logistic_regression(float learningRate, int rows, int columns):
     learningRate(learningRate),
     w(rows, columns),
-    b(rows, 1),
-    j(1, columns) 
+    b(rows, 1)
+    // j(1, columns) 
 {
     for (int j = 0; j < columns; j++) {
         for (int i = 0; i < rows; i++) {
@@ -31,11 +31,19 @@ logistic_regression::logistic_regression(float learningRate, int rows, int colum
     }
 }
 
-logistic_regression::~logistic_regression() {}
+logistic_regression::~logistic_regression() {
+    std::cout << "Deleting the following matrices:" << std::endl;
+    std::cout << "w:" << std::endl;
+    w.print();
+    std::cout << "b:" << std::endl;
+    b.print();
+    // std::cout << "j:" << std::endl;
+    // j.print();
+}
 
-matrix logistic_regression::getWeights() { return w; }
+matrix *logistic_regression::getWeights() { return &w; }
 
-matrix logistic_regression::gradient(matrix vectors, float predictions, int y) {
+matrix *logistic_regression::gradient(matrix &vectors, float predictions, int y) {
     if (vectors.getColumns() != w.getColumns()) {
         std::cerr << "Invalid number of elements" << std::endl;
         // return;
@@ -43,20 +51,20 @@ matrix logistic_regression::gradient(matrix vectors, float predictions, int y) {
     int rows = vectors.getRows();
     int columns = vectors.getColumns();
 
-    matrix thetas(1, columns + 1); //extra position for b
+    matrix *thetas = new matrix(1, columns + 1); //extra position for b
     
     //rows = 1, //TODO expand for multiple rows => able to do batch
     for (int i = 0; i < rows; i++) {
         float error = predictions - y;
         for (int j = 0; j < columns; j++) {
-            thetas.table[0][j] += error * vectors.table[i][j];
+            thetas->table[0][j] += error * vectors.table[i][j];
         }
-        thetas.table[0][columns] += error;
+        thetas->table[0][columns] += error;
     }
     return thetas;
 }
 
-float logistic_regression::predict(matrix vectors) {
+float logistic_regression::predict(matrix &vectors) {
     if (vectors.getColumns() != w.getColumns()) {
         std::cerr << "Invalid number of elements" << std::endl;
         // return -1;
@@ -65,26 +73,28 @@ float logistic_regression::predict(matrix vectors) {
     return sigmoid(temp);
 }
 
-float logistic_regression::epoch(matrix vectors, int y) {
+float logistic_regression::epoch(matrix &vectors, int y) {
     if (vectors.getColumns() != w.getColumns()) {
         std::cerr << "Invalid number of elements epoch" << std::endl;
         // return -1;
     }
     float predictions = predict(vectors);
-    matrix thetas = gradient(vectors, predictions, y);
+    matrix *thetas = gradient(vectors, predictions, y);
     //update weights
-    std::cout << "\nrecieved thetas:" << std::endl;
-    thetas.print();
-    std::cout << "\nweights before:" << std::endl;
-    b.print();
-    w.print();
-    int cols = thetas.getColumns();
+    // std::cout << "\nrecieved thetas:" << std::endl;
+    // thetas.print();
+    // std::cout << "\nweights before:" << std::endl;
+    // b.print();
+    // w.print();
+    int cols = thetas->getColumns();
     for (int i = 0; i < cols - 1; i++) {
-        w.table[0][i] -= learningRate * thetas.table[0][i];
+        w.table[0][i] -= learningRate * thetas->table[0][i];
     }
-    b.table[0][0] -= learningRate * thetas.table[0][cols];
-    std::cout << "\nweights after:" << std::endl;
-    b.print();
-    w.print();
+    b.table[0][0] -= learningRate * thetas->table[0][cols];
+    // std::cout << "\nweights after:" << std::endl;
+    // b.print();
+    // w.print();
+
+    delete thetas;
     return this->abs(predict(vectors) - y);
 }

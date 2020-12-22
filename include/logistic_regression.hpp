@@ -11,7 +11,7 @@ private:
     matrix w;
     matrix b;
 
-    matrix j;
+    // matrix j;
 
     static float sigmoid(float v);
     // static float acusigmoid(float v);
@@ -21,11 +21,11 @@ public:
     logistic_regression(float learningRate, int rows, int columns);
     ~logistic_regression();
 
-    matrix getWeights();
+    matrix *getWeights();
 
-    matrix gradient(matrix vectors, float prediction, int y);
-    float predict(matrix vectors);
-    float epoch(matrix vectors, int y);
+    matrix *gradient(matrix &vectors, float prediction, int y);
+    float predict(matrix &vectors);
+    float epoch(matrix &vectors, int y);
     // float cost(matrix values, int y);
 
 };
