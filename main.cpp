@@ -183,15 +183,13 @@ int main(int argc, char** argv) {
         return -1; //if it failed stop
     }
 
-    std::cout << "oof" << std::endl;
     Index index(buckets);
     hashtable<json_index> json_index_hashtable(buckets);
     list<json_index> json_index_container;
     list<jsonObject> jsonContainer;
-    if(make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets) != 0){
+    if(make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder) != 0){
         return -2;
     }
-    std::cout << "oof" << std::endl;
 
     //out pairs to file
     if (extractPairs(cliqueContainer, csvOutputFile) != 0) {

@@ -1,4 +1,6 @@
+#include <iostream>
 #include <string>
+
 
 #include "utilities.hpp"
 
@@ -10,7 +12,7 @@ std::string id_to_path(std::string id, std::string folder){
     size_t p = -1; 
     while ((p = id.find("//")) != std::string::npos) 
             id.replace(p, 2, "/");
-    return folder+id+".json";
+    return folder+"/"+id+".json";
 }
 
 std::string removeWord(std::string str, std::string word)  

@@ -40,9 +40,13 @@ private:
     hashtable<IndexObject> *hash;
     list<IndexObject> *container;
     unsigned int words_counter;
+    unsigned int jsons_counter;
 public:
     Index(int buckets);
     ~Index();
+
+    void raiseJsons_counter();
+    unsigned int getJsons_counter();
 
     unsigned int get_words_counter();
 
@@ -57,7 +61,7 @@ public:
     void fix_dim();
     int getDim(std::string key);
 
-    void fix_idf(int n);
+    void fix_idf();
     float getIdf(std::string key);
 
     float getAverageIdf();
@@ -112,6 +116,6 @@ public:
 void insert_word(Index* index,json_index* json,std::string word);
 void get_vector_tfidf(Index* index,json_index* json,float* vec);
 void make_get_vector_tfidf(Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string id,std::string path,float* vec);
-int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets);
+int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string path);
 
 #endif /* SPEC_HPP */

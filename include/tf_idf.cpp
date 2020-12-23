@@ -16,7 +16,8 @@
 Index::Index(int buckets){
     hash = new hashtable<IndexObject>(buckets);
     container = new list<IndexObject>();
-    words_counter=0;
+    words_counter = 0;
+    jsons_counter = 0;
 }
 
 Index::~Index(){
@@ -24,6 +25,15 @@ Index::~Index(){
     delete container;
     delete hash;
 }
+
+void Index::raiseJsons_counter(){
+    jsons_counter++;
+}
+
+unsigned int Index::getJsons_counter(){
+    return jsons_counter;
+}
+
 
 unsigned int Index::get_words_counter(){
     return words_counter;
@@ -89,10 +99,10 @@ void Index::fix_dim(){
 
 }
 
-void Index::fix_idf(int n){
+void Index::fix_idf(){
     listNode<IndexObject> *current = container->getStart();
     while (current != NULL) {
-        current->getContent()->find_setIdf(n);
+        current->getContent()->find_setIdf(jsons_counter);
         current = current->getNext();
     }
 }
@@ -232,13 +242,51 @@ void get_vector_tfidf(Index* index,json_index* json,float* vec){
     }
 }
 
+void insert_json(Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string id,std::string path){
+    std::string stopwords[119] = {"a","able","about","across","after","all","almost","also","am","among","an","and","any","are","as","at","be","because","been","but","by","can","cannot","could","dear","did","do","does","either","else","ever","every","for","from","get","got","had","has","have","he","her","hers","him","his","how","however","i","if","in","into","is","it","its","just","least","let","like","likely","may","me","might","most","must","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","she","should","since","so","some","than","that","the","their","them","then","there","these","they","this","tis","to","too","twas","us","wants","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","yet","you","your"};
+    if(!json_index_hashtable->isInside(id)){
+        // Parse the json
+        jsonParser parser;
+        // std::cout << "jsonContainer insert " << path1 << std::endl;
+        path=id_to_path(id,path);
+        jsonObject* json = parser.parse(path);
+
+        // Clear data
+        std::string json_string = json->stringy();
+        json_string = std::regex_replace(json_string, std::regex(R"([^A-Za-z ][\\n]*)"), " ");
+            for(int i=0; i<119;i++){
+            json_string = std::regex_replace(json_string, std::regex("[^a-zA-Z]("+stopwords[i]+")[^a-zA-Z]"), " ");
+        }
+        json_string = removeWord(json_string,"  ");
+
+
+        // Make json_index
+        json_index* j_index = new json_index(id,buckets);
+        // feed index
+        std::stringstream ss(json_string);
+        std::string buf;
+        while (ss >> buf){
+            insert_word(index,j_index,buf);
+        }
+        j_index->fix_Tf();
+        index->raiseJsons_counter();
+        index->fix_idf();
+        // Sace data for future use
+        jsonContainer->insert(json);
+        json_index_container->insert(j_index);
+        json_index_hashtable->insert(j_index);
+
+        index->fix_dim();
+    }
+}
+
 void make_get_vector_tfidf(Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string id,std::string path,float* vec){
     std::string stopwords[119] = {"a","able","about","across","after","all","almost","also","am","among","an","and","any","are","as","at","be","because","been","but","by","can","cannot","could","dear","did","do","does","either","else","ever","every","for","from","get","got","had","has","have","he","her","hers","him","his","how","however","i","if","in","into","is","it","its","just","least","let","like","likely","may","me","might","most","must","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","she","should","since","so","some","than","that","the","their","them","then","there","these","they","this","tis","to","too","twas","us","wants","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","yet","you","your"};
     if(!json_index_hashtable->isInside(id)){
         // Parse the json
         jsonParser parser;
         // std::cout << "jsonContainer insert " << path1 << std::endl;
-        std::string path=id_to_path(id,"./Datasets/2013_camera_specs/");
+        path=id_to_path(id,path);
         jsonObject* json = parser.parse(path);
 
         // Clear data
@@ -268,7 +316,7 @@ void make_get_vector_tfidf(Index* index,hashtable<json_index>* json_index_hashta
     return get_vector_tfidf(index,json_index_hashtable->getContentByKeyValue(id),vec);
 }
 
-int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets) {
+int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string path) {
     std::ifstream inputFile(csvPath);
     std::string stopwords[119] = {"a","able","about","across","after","all","almost","also","am","among","an","and","any","are","as","at","be","because","been","but","by","can","cannot","could","dear","did","do","does","either","else","ever","every","for","from","get","got","had","has","have","he","her","hers","him","his","how","however","i","if","in","into","is","it","its","just","least","let","like","likely","may","me","might","most","must","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","she","should","since","so","some","than","that","the","their","them","then","there","these","they","this","tis","to","too","twas","us","wants","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","yet","you","your"};
     try {
@@ -276,7 +324,6 @@ int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_ind
             throw "Can't open file!";
         }
 
-        int json_counter = 0;
         std::string line;
         getline(inputFile, line); //skip first line
         while (getline(inputFile, line)) { //for every line in file
@@ -286,10 +333,10 @@ int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_ind
             }else{
                 std::string id1,id2,path1,path2;
                 id1 = line.substr(0, line.find(","));
-                path1=id_to_path(id1,"./Datasets/2013_camera_specs/");
+                path1=id_to_path(id1,path);
                 line.erase(0, id1.length()+1);
                 id2 = line.substr(0, line.find(","));
-                path2=id_to_path(id2,"./Datasets/2013_camera_specs/");
+                path2=id_to_path(id2,path);
                 
                 if(!json_index_hashtable->isInside(id1)){
                     // Parse the json
@@ -316,7 +363,7 @@ int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_ind
                     }
                     j_index->fix_Tf();
 
-                    json_counter++;
+                    index->raiseJsons_counter();
                     // Save data for future use
                     jsonContainer->insert(json);
                     json_index_container->insert(j_index);
@@ -347,7 +394,7 @@ int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_ind
                     }
                     j_index2->fix_Tf();
 
-                    json_counter++;
+                    index->raiseJsons_counter();
                     // Save data for future use
                     jsonContainer->insert(json2);
                     json_index_container->insert(j_index2);
@@ -357,7 +404,7 @@ int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_ind
             }
 
         }
-        index->fix_idf(json_counter);
+        index->fix_idf();
         index->fix_dim();
     }
     catch (const char* e) {
