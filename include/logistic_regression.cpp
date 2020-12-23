@@ -23,11 +23,11 @@ logistic_regression::logistic_regression(float learningRate, int rows, int colum
     b(rows, 1)
     // j(1, columns) 
 {
-    for (int j = 0; j < columns; j++) {
-        for (int i = 0; i < rows; i++) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
             w.table[i][j] = (float)(rand())/RAND_MAX;
         }
-        b.table[0][j] = (float)(rand())/RAND_MAX;
+        b.table[i][0] = (float)(rand())/RAND_MAX;
     }
 }
 
@@ -51,15 +51,17 @@ matrix *logistic_regression::gradient(matrix &vectors, float predictions, int y)
     int rows = vectors.getRows();
     int columns = vectors.getColumns();
 
-    matrix *thetas = new matrix(1, columns + 1); //extra position for b
+    std::cout << rows << "  " << columns + 1 << std::endl;
+    matrix *thetas = new matrix(rows, columns + 1); //extra position for b
     
     //rows = 1, //TODO expand for multiple rows => able to do batch
+
     for (int i = 0; i < rows; i++) {
         float error = predictions - y;
         for (int j = 0; j < columns; j++) {
             thetas->table[0][j] += error * vectors.table[i][j];
         }
-        thetas->table[0][columns] += error;
+        thetas->table[i][columns] += error;
     }
     return thetas;
 }
@@ -78,8 +80,11 @@ float logistic_regression::epoch(matrix &vectors, int y) {
         std::cerr << "Invalid number of elements epoch" << std::endl;
         // return -1;
     }
+    std::cout << "(1)" << std::endl;
     float predictions = predict(vectors);
+    std::cout << "(2)" << std::endl;
     matrix *thetas = gradient(vectors, predictions, y);
+    std::cout << "(3)" << std::endl;
     //update weights
     // std::cout << "\nrecieved thetas:" << std::endl;
     // thetas.print();
@@ -87,10 +92,13 @@ float logistic_regression::epoch(matrix &vectors, int y) {
     // b.print();
     // w.print();
     int cols = thetas->getColumns();
-    for (int i = 0; i < cols - 1; i++) {
-        w.table[0][i] -= learningRate * thetas->table[0][i];
+    std::cout << "(4)" << std::endl;
+    for (int j = 0; j < cols - 1; j++) {
+        w.table[0][j] -= learningRate * thetas->table[0][j];
     }
-    b.table[0][0] -= learningRate * thetas->table[0][cols];
+    std::cout << "(5)" << std::endl;
+    b.table[0][0] -= learningRate * thetas->table[0][cols-1];
+    std::cout << "(6)" << std::endl;
     // std::cout << "\nweights after:" << std::endl;
     // b.print();
     // w.print();

@@ -103,11 +103,10 @@ int main() {
         std::cout << lr.epoch(*matrices[i], (i == 2 || i == 5 || i == 6 || i == 7) ? 0 : 1) << std::endl;
     }
 
-    // for (int i = 0; i < 9; i++) {
-    //     delete matrices[i];
-    // }
-
-    // delete[] matrices;
+    for (int i = 0; i < 9; i++) {
+        delete matrices[i];
+    }
+    delete[] matrices;
 
     // matrix temp = vector(1, 2, 3);
     // std::cout << lr.epoch(temp, 1) << std::endl;

@@ -6,18 +6,13 @@
 matrix::matrix(int row, int column) {
     size[0] = row;
     size[1] = column;
-    try {
-        table = new float *[row];
-        for (int i = 0; i < row; i++) {
-            table[i] = new float[column];
-            for (int j = 0; j < column; j++)
-                table[i][j] = 0;
-            // memset(table[i], 0, sizeof(float) * column);
-        }
-    }
-    catch(const std::exception& e) {
-        std::cerr << e.what() << '\n';
-        exit(-1);
+    std::cout << row << "  " << column << std::endl;
+    table = new float *[row];
+    for (int i = 0; i < row; i++) {
+        table[i] = new float[column];
+        for (int j = 0; j < column; j++)
+            table[i][j] = 0.0f;
+        // memset(table[i], 0, sizeof(float) * column);
     }
 }
 
@@ -38,8 +33,6 @@ matrix::matrix(int row, int column) {
 matrix::~matrix() {
     for (int i = 0; i < size[0]; i++) {
         delete[] table[i];
-        // if (memcmp(table[i], 0, )  != NULL) {
-        // }
     }
     delete[] table;
 }
