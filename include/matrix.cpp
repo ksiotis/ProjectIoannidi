@@ -6,7 +6,7 @@
 matrix::matrix(int row, int column) {
     size[0] = row;
     size[1] = column;
-    std::cout << row << "  " << column << std::endl;
+    // std::cout << row << "  " << column << std::endl;
     table = new float *[row];
     for (int i = 0; i < row; i++) {
         table[i] = new float[column];

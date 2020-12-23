@@ -224,7 +224,7 @@ void get_vector_tfidf(Index* index,json_index* json,float* vec){
     listNode<json_indexObject> *current = json->get_container()->getStart();
     while (current != NULL) {
         word = current->getContent()->getId();
-        std::cout << word;
+        // std::cout << word;
         dimension = index->getDim(word);
         // std::cout << " dim: " << dimension << ", count:  " << current->getContent()->getCount() << ", idf: " << index->getIdf(word) << std::endl;
         vec[dimension] = current->getContent()->getTf() * index->getIdf(word);
