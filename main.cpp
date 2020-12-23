@@ -116,7 +116,7 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
     return 0;
 }
 
-int extractPairs(list<clique> &cliqueContainer, std::string csvOutputFile) {
+int extractPositivePairs(list<clique> &cliqueContainer, std::string csvOutputFile) {
     try {
         //check if output file already exists
         std::ifstream outfile;
@@ -192,7 +192,7 @@ int main(int argc, char** argv) {
     }
 
     //out pairs to file
-    if (extractPairs(cliqueContainer, csvOutputFile) != 0) {
+    if (extractPositivePairs(cliqueContainer, csvOutputFile) != 0) {
         return -1; //if it failed stop
     }
 

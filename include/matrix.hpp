@@ -8,15 +8,16 @@ public:
     float **table;
 
     matrix(int row, int column);
-    matrix(const matrix &mat);
+    // matrix(const matrix &mat);
     ~matrix();
 
     int getRows();
     int getColumns();
 
     static float sum();
-    static float dot(matrix a, matrix b);
+    static float dot(matrix &a, matrix &b);
     // static matrix multiplication();
+    matrix *row(int row);
 
     void print();
 };
