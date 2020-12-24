@@ -11,9 +11,11 @@ private:
     matrix w;
     matrix b;
 
+    matrix *predictions;
     // matrix j;
 
-    static float sigmoid(float v);
+    static void sigmoid(matrix &v);
+    static void sigmoid(matrix *v);
     // static float acusigmoid(float v);
 public:
     static float abs(float v);
@@ -23,9 +25,9 @@ public:
 
     matrix *getWeights();
 
-    matrix *gradient(matrix &vectors, float prediction, int y);
-    float predict(matrix &vectors);
-    float epoch(matrix &vectors, int y);
+    matrix *gradient(matrix &vectors, matrix &prediction, int *y);
+    matrix *predict(matrix &vectors);
+    float epoch(matrix &vectors, int *y);
     // float cost(matrix values, int y);
 
 };

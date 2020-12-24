@@ -10,9 +10,9 @@ matrix::matrix(int row, int column) {
     table = new float *[row];
     for (int i = 0; i < row; i++) {
         table[i] = new float[column];
-        for (int j = 0; j < column; j++)
-            table[i][j] = 0.0f;
-        // memset(table[i], 0, sizeof(float) * column);
+        // for (int j = 0; j < column; j++)
+        //     table[i][j] = 0.0f;
+        memset(table[i], 0, sizeof(float) * column);
     }
 }
 
@@ -41,20 +41,27 @@ int matrix::getRows() { return size[0]; }
 
 int matrix::getColumns() { return size[1]; }
 
-float matrix::dot(matrix &a, matrix &b) {
+matrix *matrix::dot(matrix &a, matrix &b) {
     if (a.getColumns() != b.getColumns()) {
-        std::cerr << "Invalid element number" << std::endl;
+        std::cerr << "Invalid element number dot" << std::endl;
         // return -1;
     }
-    // matrix returnable(a.getRows(), 1);
-    float sum = 0;
-    for (int i = 0; i < a.getRows(); i++) {
-        for (int j = 0; j < a.getColumns(); j++) {
-            sum += a.table[i][j] * b.table[i][j];
+    if (a.getRows() != b.getRows()) {
+        std::cerr << "Invalid row number dot" << std::endl;
+        // return -1;
+    }
+
+    int rows = a.getRows();
+    int columns = a.getRows();
+    matrix *returnable = new matrix(rows, 1);
+    // float sum = 0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            returnable->table[i][0] += a.table[i][j] * b.table[i][j];
         }
     }
 
-    return sum;
+    return returnable;
 }
 
 matrix *matrix::row(int row) {

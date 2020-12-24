@@ -99,8 +99,10 @@ int main() {
         }
     }
 
+    int y[9] = {1,1,0,1,1,0,1,0,0};
+
     for (int i = 0; i < 9; i++) {
-        std::cout << lr.epoch(*matrices[i], (i == 2 || i == 5 || i == 6 || i == 7) ? 0 : 1) << std::endl;
+        std::cout << lr.epoch(*matrices[i], &(y[i])) << std::endl;
     }
 
     for (int i = 0; i < 9; i++) {
