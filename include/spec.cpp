@@ -45,11 +45,6 @@ void spec::unsimilar(spec *second) {
         std::cerr << "Called unsimilar on specs that are similar!" << std::endl;
         return;
     }
-
-    //TODO remove
-    // if (id == "www.ebay.com//25120" || second->getId() == "www.ebay.com//25120") {
-    //     std::cout << "yas";
-    // }
     myClique->addNegative(second->getClique());
 }
 

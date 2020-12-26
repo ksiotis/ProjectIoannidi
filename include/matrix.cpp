@@ -42,22 +42,21 @@ int matrix::getRows() { return size[0]; }
 int matrix::getColumns() { return size[1]; }
 
 matrix *matrix::dot(matrix &a, matrix &b) {
+    //b is (1,n)
     if (a.getColumns() != b.getColumns()) {
         std::cerr << "Invalid element number dot" << std::endl;
         // return -1;
     }
-    if (a.getRows() != b.getRows()) {
-        std::cerr << "Invalid row number dot" << std::endl;
-        // return -1;
-    }
+    if (b.getRows() != 1)
+        std::cerr << "second table of dot has many rows, using only the first" << std::endl;
 
     int rows = a.getRows();
     int columns = a.getRows();
     matrix *returnable = new matrix(rows, 1);
-    // float sum = 0;
+    
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            returnable->table[i][0] += a.table[i][j] * b.table[i][j];
+            returnable->table[i][0] += a.table[i][j] * b.table[0][j];
         }
     }
 

@@ -17,6 +17,8 @@ private:
     static void sigmoid(matrix &v);
     static void sigmoid(matrix *v);
     // static float acusigmoid(float v);
+    matrix *gradient(matrix &vectors, matrix &prediction, int *y);
+    float cost(int *y);
 public:
     static float abs(float v);
     // logistic_regression() {}; //for loading from file only;
@@ -25,11 +27,8 @@ public:
 
     matrix *getWeights();
 
-    matrix *gradient(matrix &vectors, matrix &prediction, int *y);
-    matrix *predict(matrix &vectors);
     float epoch(matrix &vectors, int *y);
-    // float cost(matrix values, int y);
-
+    matrix *predict(matrix &vectors);
 };
 
 #endif /*LOGISTIC_REGRESSION_HPP*/

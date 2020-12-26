@@ -18,6 +18,9 @@ avl_test: ../include/avl.hpp avl_test.cpp utilities.o
 list_test: ../include/list.hpp list_test.cpp
 	$(CC) $(CFLAGS) list_test.cpp -o list_test
 
+matrix_test: matrix_test.cpp matrix.o
+	$(CC) $(CFLAGS) matrix_test.cpp ../builder/matrix.o -o matrix_test
+
 spec.o: ../include/spec.cpp
 	$(CC) $(CFLAGS) -c ../include/spec.cpp -o ../builder/spec.o
 
@@ -26,6 +29,9 @@ utilities.o: ../include/utilities.cpp
 
 jsonParser.o: ../include/jsonParser.cpp ../include/jsonParser.hpp 
 	$(CC) $(CFLAGS) -c ../include/jsonParser.cpp -o ../builder/jsonParser.o
+
+matrix.o: ../include/matrix.cpp
+	$(CC) $(CFLAGS) -c ../include/matrix.cpp -o ../builder/matrix.o
 
 example.o: example.cpp
 	$(CC) $(CFLAGS) -c example.cpp -o ../builder/example.o

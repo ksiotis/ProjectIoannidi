@@ -105,6 +105,14 @@ int main() {
         std::cout << lr.epoch(*matrices[i], &(y[i])) << std::endl;
     }
 
+    matrix train(9, vec_size);
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < vec_size; j++) {
+            train.table[i][j] = matrices[i]->table[0][j];
+        }
+    }
+    std::cout << lr.epoch(train, y) << std::endl;
+
     for (int i = 0; i < 9; i++) {
         delete matrices[i];
     }

@@ -31,16 +31,14 @@ void logistic_regression::sigmoid(matrix *x) {
 
 logistic_regression::logistic_regression(float learningRate, int rows, int columns):
     learningRate(learningRate),
-    w(rows, columns),
-    b(rows, 1)
-    // j(1, columns) 
+    w(1, columns),
+    b(1, 1)
 {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++) {
-            w.table[i][j] = (float)(rand())/RAND_MAX;
-        }
-        b.table[i][0] = (float)(rand())/RAND_MAX;
+    for (int j = 0; j < columns; j++) {
+        w.table[0][j] = (float)(rand())/RAND_MAX;
     }
+    b.table[0][0] = (float)(rand())/RAND_MAX;
+
     predictions = NULL;
 }
 
@@ -77,13 +75,9 @@ matrix *logistic_regression::predict(matrix &vectors) {
         std::cerr << "Invalid number of elements predict" << std::endl;
         // return -1;
     }
-    if (vectors.getRows() != w.getRows()) {
-        std::cerr << "Invalid rows predict" << std::endl;
-        // return -1;
-    }
 
     matrix *temp = matrix::dot(vectors, w);
-    int rows = w.getRows();
+    int rows = vectors.getRows();
     for (int i = 0; i < rows; i++) {
         temp->table[i][0] += b.table[0][0];
     }
@@ -96,27 +90,33 @@ float logistic_regression::epoch(matrix &vectors, int *y) {
         std::cerr << "Invalid number of elements epoch" << std::endl;
         // return -1;
     }
-    if (vectors.getRows() != w.getRows()) {
-        std::cerr << "Invalid number of rows epoch" << std::endl;
-        // return -1;
-    }
 
-    if (predictions == NULL)
-        predictions = predict(vectors);
+    if (predictions != NULL)
+        delete predictions;
+    predictions = predict(vectors);
+
     matrix *thetas = gradient(vectors, *predictions, y);
+    
     //update weights
     int rows = thetas->getRows();
     int cols = thetas->getColumns();
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols - 1; j++) {
-            w.table[i][j] -= learningRate * thetas->table[i][j];
+            w.table[0][j] -= learningRate * thetas->table[i][j];
         }
-        b.table[i][0] -= learningRate * thetas->table[i][cols-1];
+        b.table[0][0] -= learningRate * thetas->table[i][cols-1];
     }
 
-    delete predictions;
     predictions = predict(vectors);
 
+    float error = cost(y);
+
+    delete thetas;
+    return error;
+}
+
+float logistic_regression::cost(int *y) {
+    int rows = predictions->getRows();
     bool overflow = false; //flag to check if error overflows(could happen for too many rows)
     float error = 0;
     for (int i = 0, rows = predictions->getRows(); i < rows; i++) {
@@ -133,8 +133,6 @@ float logistic_regression::epoch(matrix &vectors, int *y) {
     }
     else
         error /= rows;
-    //this->abs(predict(vectors) - y);
 
-    delete thetas;
     return error;
 }
