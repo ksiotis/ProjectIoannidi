@@ -29,7 +29,7 @@ void logistic_regression::sigmoid(matrix *x) {
 //     return 1 / exp(-x);
 // }
 
-logistic_regression::logistic_regression(float learningRate, int rows, int columns):
+logistic_regression::logistic_regression(float learningRate, int columns):
     learningRate(learningRate),
     w(1, columns),
     b(1, 1)

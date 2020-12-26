@@ -69,7 +69,7 @@ int main() {
     // for(int i=0;i<vec_size;i++){
     //     vec[i] = 0;
     // }
-    logistic_regression lr(10.0f, 1, vec_size);
+    logistic_regression lr(10.0f, vec_size);
     matrix ma(3, vec_size);
 
 

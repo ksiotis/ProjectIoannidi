@@ -37,4 +37,4 @@ example.o: example.cpp
 	$(CC) $(CFLAGS) -c example.cpp -o ../builder/example.o
 
 clean:
-	rm -rf ../builder/* list_test avl_test hashtable_test spec_test jsonParser_test
+	rm -rf list_test avl_test hashtable_test spec_test jsonParser_test matrix_test

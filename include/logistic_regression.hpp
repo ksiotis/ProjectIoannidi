@@ -22,7 +22,7 @@ private:
 public:
     static float abs(float v);
     // logistic_regression() {}; //for loading from file only;
-    logistic_regression(float learningRate, int rows, int columns);
+    logistic_regression(float learningRate, int columns);
     ~logistic_regression();
 
     matrix *getWeights();

@@ -14,7 +14,7 @@ public:
     int getRows();
     int getColumns();
 
-    static float sum();
+    // static float sum();
     static matrix *dot(matrix &a, matrix &b);
     // static matrix multiplication();
     matrix *row(int row);
