@@ -194,19 +194,24 @@ int main(int argc, char** argv) {
 
     
     int trainSet = lines / 100 * 60;
-    if(make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets, trainSet) != 0){
+    if(make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets, folder, trainSet) != 0){
         std::cout << "Error make tfidf 1" << std::endl;
         return -2;
     }
 
     int vec_count = index.get_words_counter();
     matrix training(trainSet, vec_count);
-    // TODO transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets)
-    //      return y* with 1 or 0 and NULL if fail
-    //      perhaps have starting line and finishing line
-    
+    int *y;
+    std::cout << "HOLA" << std::endl;
+    y = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&training,trainSet);
+    std::cout << "HOLA" << std::endl;
+    for(int i=0; i<trainSet; i++){
+        std::cout << y[i] << ",";
+    }
+    std::cout << std::endl;
     logistic_regression lr(2.0f, vec_count);
-    lr.epoch(training, y);
+    std::cout << lr.epoch(training, y) << std::endl;
+    
 
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);
