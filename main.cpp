@@ -4,12 +4,14 @@
 #include <sys/types.h>
 #include <fstream>
 #include <sstream>
+#include <cstring>
 
 #include "include/spec.hpp"
 #include "include/hashtable.hpp"
 #include "include/list.hpp"
 #include "include/jsonParser.hpp"
 #include "include/tf_idf.hpp"
+#include "include/logistic_regression.hpp"
 
 // template <typename T>
 // std::string T::* treeNode<T>::keyValue = &generic::id;
@@ -69,21 +71,20 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
             throw "Can't open file!";
         }
 
+        int counter = 0;
+
         std::string line;
         getline(inputFile, line); //skip first line
         while (getline(inputFile, line)) { //for every line in file
             // std::cout << line;
+            counter++;
             if (line.back() == '1') {// a,b,1
                 //line is ending in 1
-                std::string id1,id2;
+                std::string id1, id2;
                 id1 = line.substr(0, line.find(","));
                 line.erase(0, id1.length()+1);
                 id2 = line.substr(0, line.find(","));
 
-                // //TODO remove
-                // if (id1 == "www.ebay.com//25120" || id2 == "www.ebay.com//25120") {
-                //     std::cout << "yas";
-                // }
 
                 // std::cout << "(1)" << std::endl;
                 hashtab.getContentByKeyValue(id1)->merge(hashtab.getContentByKeyValue(id2)); 
@@ -95,11 +96,6 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
                 line.erase(0, id1.length()+1);
                 id2 = line.substr(0, line.find(","));
 
-                // //TODO remove
-                // if (id1 == "www.ebay.com//25120" || id2 == "www.ebay.com//25120") {
-                //     std::cout << "yas";
-                // }
-
                 // std::cout << "(2)" << std::endl;
                 hashtab.getContentByKeyValue(id1)->unsimilar(hashtab.getContentByKeyValue(id2));
             }
@@ -107,13 +103,13 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
                 std::cout << "Bad line: \"" << line << '"' << std::endl;
         }
 
+        return counter;
     }
     catch (const char* e) {
         std::cout << "File Error! " << e << std::endl;
         inputFile.close();
         return -1;
     }
-    return 0;
 }
 
 int extractPositivePairs(list<clique> &cliqueContainer, std::string csvOutputFile) {
@@ -169,6 +165,7 @@ int main(int argc, char** argv) {
         }
     }
 
+
     jsonParser parser;
     //initialize container structures
     hashtable<spec> hashtab(buckets);
@@ -178,25 +175,38 @@ int main(int argc, char** argv) {
     //read directories to get ids and add them to the apropriate container structures
     read_directory(folder, hashtab, specContainer, cliqueContainer);
 
-    //read csv file and reorganize the cliques accordingly
-    if (readCSV(csv_file, hashtab) != 0) {
+    //read csv file and reorganize the cliques accordingly...
+    //and get the number of lines in file to split into train,test,eval
+    int lines = readCSV(csv_file, hashtab);
+    if (lines < 0) {
         return -1; //if it failed stop
     }
-
-    std::cout << "oof" << std::endl;
-    Index index(buckets);
-    hashtable<json_index> json_index_hashtable(buckets);
-    list<json_index> json_index_container;
-    list<jsonObject> jsonContainer;
-    if(make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets) != 0){
-        return -2;
-    }
-    std::cout << "oof" << std::endl;
 
     //out pairs to file
     if (extractPositivePairs(cliqueContainer, csvOutputFile) != 0) {
         return -1; //if it failed stop
     }
+
+    Index index(buckets);
+    hashtable<json_index> json_index_hashtable(buckets);
+    list<json_index> json_index_container;
+    list<jsonObject> jsonContainer;
+
+    
+    int trainSet = lines / 100 * 60;
+    if(make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets, trainSet) != 0){
+        std::cout << "Error make tfidf 1" << std::endl;
+        return -2;
+    }
+
+    int vec_count = index.get_words_counter();
+    matrix training(trainSet, vec_count);
+    // TODO transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets)
+    //      return y* with 1 or 0 and NULL if fail
+    //      perhaps have starting line and finishing line
+    
+    logistic_regression lr(2.0f, vec_count);
+    lr.epoch(training, y);
 
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);

@@ -142,7 +142,7 @@ ofile must be an ofstream opened outside of here*/
                 std::cerr << "Bad clique in printPairs" << std::endl;
             }
             ofile << first->getContent()->getId() <<
-            "," << second->getContent()->getId() << "\n";
+            "," << second->getContent()->getId() << ",1\n";
 
             second = second->getNext();
         }

@@ -112,6 +112,6 @@ public:
 void insert_word(Index* index,json_index* json,std::string word);
 void get_vector_tfidf(Index* index,json_index* json,float* vec);
 void make_get_vector_tfidf(Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string id,std::string path,float* vec);
-int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets);
+int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets, int lines = __INT_MAX__);
 
 #endif /* SPEC_HPP */
