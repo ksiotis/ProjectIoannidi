@@ -69,7 +69,7 @@ int main() {
     // for(int i=0;i<vec_size;i++){
     //     vec[i] = 0;
     // }
-    logistic_regression lr(10.0f, 1, vec_size);
+    logistic_regression lr(10.0f, vec_size);
     matrix ma(3, vec_size);
 
 
@@ -99,15 +99,24 @@ int main() {
         }
     }
 
+    int y[9] = {1,1,0,1,1,0,1,0,0};
+
     for (int i = 0; i < 9; i++) {
-        std::cout << lr.epoch(*matrices[i], (i == 2 || i == 5 || i == 6 || i == 7) ? 0 : 1) << std::endl;
+        std::cout << lr.epoch(*matrices[i], &(y[i])) << std::endl;
     }
 
-    // for (int i = 0; i < 9; i++) {
-    //     delete matrices[i];
-    // }
+    matrix train(9, vec_size);
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < vec_size; j++) {
+            train.table[i][j] = matrices[i]->table[0][j];
+        }
+    }
+    std::cout << lr.epoch(train, y) << std::endl;
 
-    // delete[] matrices;
+    for (int i = 0; i < 9; i++) {
+        delete matrices[i];
+    }
+    delete[] matrices;
 
     // matrix temp = vector(1, 2, 3);
     // std::cout << lr.epoch(temp, 1) << std::endl;

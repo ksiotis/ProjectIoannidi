@@ -11,23 +11,24 @@ private:
     matrix w;
     matrix b;
 
+    matrix *predictions;
     // matrix j;
 
-    static float sigmoid(float v);
+    static void sigmoid(matrix &v);
+    static void sigmoid(matrix *v);
     // static float acusigmoid(float v);
+    matrix *gradient(matrix &vectors, matrix &prediction, int *y);
+    float cost(int *y);
 public:
     static float abs(float v);
     // logistic_regression() {}; //for loading from file only;
-    logistic_regression(float learningRate, int rows, int columns);
+    logistic_regression(float learningRate, int columns);
     ~logistic_regression();
 
     matrix *getWeights();
 
-    matrix *gradient(matrix &vectors, float prediction, int y);
-    float predict(matrix &vectors);
-    float epoch(matrix &vectors, int y);
-    // float cost(matrix values, int y);
-
+    float epoch(matrix &vectors, int *y);
+    matrix *predict(matrix &vectors);
 };
 
 #endif /*LOGISTIC_REGRESSION_HPP*/
