@@ -189,6 +189,7 @@ int main(int argc, char** argv) {
     list<jsonObject> jsonContainer;
 
     int trainSet = lines / 100 * 60;
+    int validationSet = lines / 100 * 20;
     if (make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets, folder, trainSet) != 0){
         std::cout << "Error make tfidf 1" << std::endl;
         return -2;
@@ -196,22 +197,48 @@ int main(int argc, char** argv) {
 
     unsigned int vec_count = index.get_words_counter();
     int *y;
-    
+    int *vl;
+    int *tst;
     matrix training(trainSet, vec_count);
+    matrix validation(validationSet, vec_count);
+    matrix test(lines-trainSet-validationSet, vec_count);
+
     y = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&training,trainSet);
+    
+    vl = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&validation,trainSet+validationSet,trainSet);
+    
+    tst = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&test,lines,trainSet+validationSet);
 
+    //TODO train 100 times
     logistic_regression lr(2.0f, vec_count);
-    std::cout << lr.epoch(training, y) << std::endl;
+    float curr, prev = 1000000;
+    // unsigned int i=0;
+    for (int i = 0; i < 100; i++) {
+        lr.epoch(training, y);
+
+        matrix *validationPredictions = lr.predict(validation);
+        curr = lr.compare(*validationPredictions, vl);
+        std::cout << "Epoch " << i << "\t\tError " << curr << std::endl;
+        if (prev - curr < 0.002) {
+            break;
+        }
+        prev = curr;
+        delete validationPredictions;
+    }
     delete[] y;
+    delete[] vl;
 
-    lr.extractModel("testing");
+    //TODO
+    matrix *predictions = lr.predict(test);
+    for(int i = 0;i < lines-trainSet-validationSet;i++){
+        std::cout << predictions->table[i][0] << std::endl;
+    }
+    delete predictions;
+    delete[] tst;
 
-    std::cout << "import from testing" << std::endl;
-    logistic_regression *temp = lr.loadModel("testing");
-    std::cout << "export to testing2" << std::endl;
-    temp->extractModel("testing2");
-
+    lr.extractModel("model");
     write_out_index(&index,"index.csv");
+
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);

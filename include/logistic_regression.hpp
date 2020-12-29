@@ -21,6 +21,7 @@ private:
     float cost(int *y);
 public:
     static float abs(float v);
+    static float compare(matrix &values, int *actual_values);
     // logistic_regression() {}; //for loading from file only;
     logistic_regression(float learningRate, int columns, bool random=true);
     ~logistic_regression();

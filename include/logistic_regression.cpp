@@ -8,6 +8,22 @@ float logistic_regression::abs(float v) {
     return v < 0 ? -v : v;
 }
 
+float logistic_regression::compare(matrix &values, int *actual_values) {
+    /*returns sum of absolute difference,
+    assumes actual_values has correct lenght*/
+    try {
+        float sum = 0;
+        for (int i = 0, rows = values.getRows(); i < rows; i++) {
+            sum += abs(values.table[i][0] - actual_values[i]);
+        }
+        return sum;
+    }
+    catch(const std::exception& e) {
+        std::cerr << e.what() << '\n';
+        return -2;
+    }
+}
+
 void logistic_regression::sigmoid(matrix &x) {
     /*aproximate sigmoid function, faster but less accurate*/
     int rows = x.getRows();

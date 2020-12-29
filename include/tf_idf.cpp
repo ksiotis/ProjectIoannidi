@@ -68,7 +68,11 @@ int Index::getNt(std::string key){
 }
 
 int Index::getDim(std::string key){
-    return hash->getContentByKeyValue(key)->getDim();
+    IndexObject *temp = hash->getContentByKeyValue(key);
+    if (temp != NULL)
+        return temp->getDim();
+    else
+        return -1;
 }
 
 float Index::getIdf(std::string key){
@@ -251,8 +255,10 @@ void get_vector_tfidf(Index* index,json_index* json,float* vec){
         word = current->getContent()->getId();
         // std::cout << word;
         dimension = index->getDim(word);
+        if(dimension != -1){
+            vec[dimension] = current->getContent()->getTf() * index->getIdf(word);
+        }
         // std::cout << " dim: " << dimension << ", count:  " << current->getContent()->getCount() << ", idf: " << index->getIdf(word) << std::endl;
-        vec[dimension] = current->getContent()->getTf() * index->getIdf(word);
         current = current->getNext();
     }
 }
@@ -442,7 +448,9 @@ int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_ind
 
     int currentLine = 0;
     std::string line;
-    getline(inputFile, line); //skip first line
+    for(int i = 0; i < start_line;i++){
+        getline(inputFile, line);
+    }
     float json1[vec_count],json2[vec_count];
     for (unsigned int i = 0; i < vec_count; i++) {
         json1[i] = 0.0;
