@@ -26,6 +26,10 @@ Index::~Index(){
     delete hash;
 }
 
+list<IndexObject>* Index::get_container(){ 
+    return container;
+}
+
 void Index::raiseJsons_counter(){
     jsons_counter++;
 }
@@ -33,7 +37,6 @@ void Index::raiseJsons_counter(){
 unsigned int Index::getJsons_counter(){
     return jsons_counter;
 }
-
 
 unsigned int Index::get_words_counter(){
     return words_counter;
@@ -43,6 +46,12 @@ void Index::insert(std::string key){
     IndexObject *in = new IndexObject(key);
     container->insert(in);
     hash->insert(in);
+    words_counter++;
+}
+
+void Index::insertObject(IndexObject *obj){
+    container->insert(obj);
+    hash->insert(obj);
     words_counter++;
 }
 
@@ -124,6 +133,12 @@ IndexObject::IndexObject(std::string a):generic(a) {
     nt = 1;
     dim = -1;
     idf = -0.5;
+}
+
+IndexObject::IndexObject(std::string a,int d,float i):generic(a) {
+    nt = 1;
+    dim = d;
+    idf = i;
 }
 
 IndexObject::~IndexObject(){}
@@ -422,12 +437,17 @@ int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_ind
             throw "Can't open file!";
     }
 
-    int vec_count = index->get_words_counter();
-    int *y = new int[vec_count];
+    unsigned int vec_count = index->get_words_counter();
+    int *y = new int[lines];
 
     int currentLine = 0;
     std::string line;
     getline(inputFile, line); //skip first line
+    float json1[vec_count],json2[vec_count];
+    for (unsigned int i = 0; i < vec_count; i++) {
+        json1[i] = 0.0;
+        json2[i] = 0.0;
+    }
     while (currentLine < lines && getline(inputFile, line)) { //for every line in file
         if(line.back()!= '0' && line.back()!= '1'){
             std::cout << "Bad line: \"" << line << '"' << std::endl;
@@ -446,18 +466,71 @@ int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_ind
             id2 = line.substr(0, line.find(","));
             
 
-            float json1[vec_count],json2[vec_count];
-            for (int i = 0; i < vec_count; i++) {
-                json1[i] = 0.0;
-                json2[i] = 0.0;
-            }
             get_vector_tfidf(index,json_index_hashtable->getContentByKeyValue(id1),json1);
             get_vector_tfidf(index,json_index_hashtable->getContentByKeyValue(id2),json2);
-            for (int i = 0; i < vec_count; i++) {
+            for (unsigned int i = 0; i < vec_count; i++) {
                 training->table[currentLine][i] = json1[i] > json2[i] ? json1[i] - json2[i] : json2[i] - json1[i];
             }
+        }
+        for (unsigned int i = 0; i < vec_count; i++) {
+            json1[i] = 0.0;
+            json2[i] = 0.0;
         }
         currentLine++;
     }
     return y;
 }
+
+void write_out_index(Index* index,std::string csvOutputFile){
+    std::ifstream outfile;
+    outfile.open(csvOutputFile);
+    if (outfile)
+        throw "File already exists!";
+
+    //create output file
+    std::ofstream ofile;
+    ofile.open(csvOutputFile);
+    if (!ofile)
+        throw "Cant't open new file";
+
+    listNode<IndexObject> *temp = index->get_container()->getStart();
+    while (temp != NULL) {
+            ofile << temp->getContent()->getId() << "," << temp->getContent()->getDim() << "," <<temp->getContent()->getIdf() << std::endl;
+        temp = temp->getNext();
+    }
+}
+
+int read_index_csv(Index* index,std::string filename){
+    std::ifstream inputFile(filename);
+    try {
+        if (inputFile.is_open() == false) {
+            throw "Can't open file!";
+        }
+
+        std::string line;
+        while (getline(inputFile, line)) { //for every line in file
+            // std::cout << line;
+
+            std::string id1,dim,idf;
+            id1 = line.substr(0, line.find(","));
+            line.erase(0, id1.length()+1);
+            dim = line.substr(0, line.find(","));
+            line.erase(0, id1.length()+1);
+            idf = line;
+            int dimension = stoi(dim);
+            float idf_num = stof(idf);
+            IndexObject *obj = new IndexObject(id1,dimension,idf_num);
+            index->insertObject(obj);
+            // std::cout << "(2)" << std::endl;
+            // TODO insert_indexObject(id,dim,idf)
+
+        }
+        return 1;
+    }
+    catch (const char* e) {
+        std::cout << "File Error! " << e << std::endl;
+        inputFile.close();
+        return -1;
+    }
+}
+
