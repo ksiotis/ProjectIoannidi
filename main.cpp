@@ -213,7 +213,6 @@ int main(int argc, char** argv) {
 
     write_out_index(&index,"index.csv");
     //empty and delete container structures and dynamic data
-    delete [] y;
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);
     jsonContainer.emptyList(true);
