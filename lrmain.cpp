@@ -60,7 +60,7 @@ int main() {
     j3.fix_Tf();
 
 
-    index.fix_idf(3); // num of json_files
+    // index.fix_idf(3); // num of json_files
     index.fix_dim();
 
 

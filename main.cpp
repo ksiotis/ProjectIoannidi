@@ -171,14 +171,14 @@ int main(int argc, char** argv) {
     //read directories to get ids and add them to the apropriate container structures
     read_directory(folder, hashtab, specContainer, cliqueContainer);
 
-    //read csv file and reorganize the cliques accordingly...
-    //and get the number of lines in file to split into train,test,eval
+    /* read csv file and reorganize the cliques accordingly...
+       and get the number of lines in file to split into train,test,eval */
     int lines = readCSV(csv_file, hashtab);
     if (lines < 0) {
         return -1; //if it failed stop
     }
 
-    //out pairs to file //TODO uncomment
+    // out pairs to file //TODO uncomment
     // if (extractPositivePairs(cliqueContainer, csvOutputFile) != 0) {
     //     return -1; //if it failed stop
     // }
@@ -198,13 +198,17 @@ int main(int argc, char** argv) {
     matrix training(trainSet, vec_count);
     int *y;
     y = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&training,trainSet);
-    // for(int i=0; i<trainSet; i++){
-    //     std::cout << y[i] << ",";
-    // }
-    // std::cerr << std::endl;
+
     logistic_regression lr(2.0f, vec_count);
     std::cout << lr.epoch(training, y) << std::endl;
     delete[] y;
+
+    lr.extractModel("testing");
+
+    std::cout << "import from testing" << std::endl;
+    logistic_regression *temp = lr.loadModel("testing");
+    std::cout << "export to testing2" << std::endl;
+    temp->extractModel("testing2");
 
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);

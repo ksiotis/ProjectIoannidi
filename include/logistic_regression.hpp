@@ -22,13 +22,17 @@ private:
 public:
     static float abs(float v);
     // logistic_regression() {}; //for loading from file only;
-    logistic_regression(float learningRate, int columns);
+    logistic_regression(float learningRate, int columns, bool random=true);
     ~logistic_regression();
 
     matrix *getWeights();
+    matrix *getBias();
 
     float epoch(matrix &vectors, int *y);
     matrix *predict(matrix &vectors);
+
+    static logistic_regression *loadModel(char *filename);
+    void extractModel(char *filename);
 };
 
 #endif /*LOGISTIC_REGRESSION_HPP*/

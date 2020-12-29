@@ -1,5 +1,6 @@
 #include <iostream>
 // #include <cmath>
+#include <fstream>
 #include "matrix.hpp"
 #include "logistic_regression.hpp"
 
@@ -29,17 +30,19 @@ void logistic_regression::sigmoid(matrix *x) {
 //     return 1 / exp(-x);
 // }
 
-logistic_regression::logistic_regression(float learningRate, int columns):
+logistic_regression::logistic_regression(float learningRate, int columns, bool random):
     learningRate(learningRate),
     w(1, columns),
     b(1, 1)
 {
-    for (int j = 0; j < columns; j++) {
-        w.table[0][j] = (float)(rand())/RAND_MAX;
-    }
-    b.table[0][0] = (float)(rand())/RAND_MAX;
+    if (random) {
+        for (int j = 0; j < columns; j++) {
+            w.table[0][j] = (float)(rand())/RAND_MAX;
+        }
+        b.table[0][0] = (float)(rand())/RAND_MAX;
 
-    predictions = NULL;
+        predictions = NULL;
+    }
 }
 
 logistic_regression::~logistic_regression() {
@@ -48,6 +51,8 @@ logistic_regression::~logistic_regression() {
 }
 
 matrix *logistic_regression::getWeights() { return &w; }
+
+matrix *logistic_regression::getBias() { return &b; }
 
 matrix *logistic_regression::gradient(matrix &vectors, matrix &predictions, int *y) {
     if (vectors.getColumns() != w.getColumns()) {
@@ -135,4 +140,54 @@ float logistic_regression::cost(int *y) {
         error /= rows;
 
     return error;
+}
+
+logistic_regression *logistic_regression::loadModel(char *filename) {
+    std::ifstream ifile;
+    ifile.open(filename);
+    if (!ifile) {
+        std::cerr << "Cant't open new file";
+        return NULL;
+    }
+    float learningRate;
+    float columns;
+    ifile >> learningRate;
+    ifile >> columns;
+    
+    logistic_regression *returnable = new logistic_regression(learningRate, columns, false);
+    float **mytable = returnable->getWeights()->table;
+    for (int i = 0; i < columns; i++) {
+        ifile >> mytable[0][i];
+    }
+    ifile >> returnable->getBias()->table[0][0];
+
+    return returnable;
+}
+
+void logistic_regression::extractModel(char *filename) {
+
+    //check if output file already exists
+    std::ifstream outfile;
+    outfile.open(filename);
+    if (outfile) {
+        std::cerr << "File already exists!";
+        return;
+    }
+
+    //create output file
+    std::ofstream ofile;
+    ofile.open(filename);
+    if (!ofile) {
+        std::cerr << "Cant't open new file";
+        return;
+    }
+
+    //write everything from logistic regression
+    int columns = w.getColumns();
+    ofile << learningRate << ' ' << columns << ' ';
+    for (int i = 0; i < columns; i++) {
+        ofile << w.table[0][i] << ' ';
+    }
+    ofile << b.table[0][0] << ' ';
+    ofile.close();
 }
