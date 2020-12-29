@@ -3,3 +3,5 @@ builder/*
 .vscode
 test
 test2
+*.csv
+*.out

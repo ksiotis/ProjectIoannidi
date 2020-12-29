@@ -20,6 +20,7 @@ private:
     float idf; 
 public:
     IndexObject(std::string a);
+    IndexObject(std::string a,int dim, float idf);
     ~IndexObject();
 
     void raiseNt();
@@ -46,6 +47,8 @@ public:
     Index(int buckets);
     ~Index();
 
+    list<IndexObject>* get_container();
+
     void raiseJsons_counter();
     unsigned int getJsons_counter();
 
@@ -53,6 +56,7 @@ public:
 
 
     void insert(std::string key);
+    void insertObject(IndexObject* obj);
 
     bool isInside(std::string key);
 
@@ -119,6 +123,6 @@ void get_vector_tfidf(Index* index,json_index* json,float* vec);
 void make_get_vector_tfidf(Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string id,std::string path,float* vec);
 int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets, std::string path, int lines = __INT_MAX__);
 int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,matrix* training, int lines = __INT_MAX__);
-
-
+void write_out_index(Index* index,std::string csvOutputFile);
+int read_index_csv(Index* index,std::string filename);
 #endif /* SPEC_HPP */

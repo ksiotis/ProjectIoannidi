@@ -194,9 +194,10 @@ int main(int argc, char** argv) {
         return -2;
     }
 
-    int vec_count = index.get_words_counter();
-    matrix training(trainSet, vec_count);
+    unsigned int vec_count = index.get_words_counter();
     int *y;
+    
+    matrix training(trainSet, vec_count);
     y = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&training,trainSet);
 
     logistic_regression lr(2.0f, vec_count);
@@ -210,7 +211,9 @@ int main(int argc, char** argv) {
     std::cout << "export to testing2" << std::endl;
     temp->extractModel("testing2");
 
+    write_out_index(&index,"index.csv");
     //empty and delete container structures and dynamic data
+    delete [] y;
     specContainer.emptyList(true);
     cliqueContainer.emptyList(true);
     jsonContainer.emptyList(true);
