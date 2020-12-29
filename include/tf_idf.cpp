@@ -247,6 +247,14 @@ void insert_word(Index* index,json_index* json,std::string word){
     }
 }
 
+void insert_word_json(json_index* json,std::string word){
+    if(json->isInside(word)){
+        json->raiseCount(word);
+    }else{
+        json->insert(word);
+    }
+}
+
 void get_vector_tfidf(Index* index,json_index* json,float* vec){
     std::string word;
     int dimension;
@@ -325,7 +333,7 @@ void make_get_vector_tfidf(Index* index,hashtable<json_index>* json_index_hashta
         std::stringstream ss(json_string);
         std::string buf;
         while (ss >> buf){
-            j_index->insert(buf);
+            insert_word_json(j_index,buf);
         }
         j_index->fix_Tf();
 
@@ -448,6 +456,7 @@ int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_ind
 
     int currentLine = 0;
     std::string line;
+    getline(inputFile, line);
     for(int i = 0; i < start_line;i++){
         getline(inputFile, line);
     }
@@ -525,7 +534,7 @@ int read_index_csv(Index* index,std::string filename){
             line.erase(0, dim.length()+1);
             idf = line;
 
-            std::cout << line << std::endl;
+            // std::cout << line << std::endl;
             int dimension = stoi(dim);
             float idf_num = stof(idf);
             IndexObject *obj = new IndexObject(id1,dimension,idf_num);

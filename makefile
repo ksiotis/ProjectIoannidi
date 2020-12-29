@@ -5,6 +5,9 @@ CFLAGS=-std=c++11 -Wall -g3
 main: utilities.o spec.o jsonParser.o tf_idf.o matrix.o logistic_regression.o
 	$(CC) $(CFLAGS) main.cpp ./builder/utilities.o ./builder/spec.o ./builder/jsonParser.o ./builder/tf_idf.o ./builder/matrix.o ./builder/logistic_regression.o -o master.out
 
+predictmain: utilities.o spec.o jsonParser.o tf_idf.o matrix.o logistic_regression.o
+	$(CC) $(CFLAGS) pred_main.cpp ./builder/utilities.o ./builder/spec.o ./builder/jsonParser.o ./builder/tf_idf.o ./builder/matrix.o ./builder/logistic_regression.o -o predictmain.out
+
 utilities.o: ./include/utilities.cpp ./include/utilities.hpp
 	$(CC) $(CFLAGS) -c ./include/utilities.cpp -o ./builder/utilities.o
 

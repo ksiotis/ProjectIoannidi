@@ -158,7 +158,7 @@ float logistic_regression::cost(int *y) {
     return error;
 }
 
-logistic_regression *logistic_regression::loadModel(char *filename) {
+logistic_regression *logistic_regression::loadModel(const char *filename) {
     std::ifstream ifile;
     ifile.open(filename);
     if (!ifile) {
@@ -180,7 +180,7 @@ logistic_regression *logistic_regression::loadModel(char *filename) {
     return returnable;
 }
 
-void logistic_regression::extractModel(char *filename) {
+void logistic_regression::extractModel(const char *filename) {
 
     //check if output file already exists
     std::ifstream outfile;

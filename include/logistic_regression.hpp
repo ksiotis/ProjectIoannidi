@@ -32,8 +32,8 @@ public:
     float epoch(matrix &vectors, int *y);
     matrix *predict(matrix &vectors);
 
-    static logistic_regression *loadModel(char *filename);
-    void extractModel(char *filename);
+    static logistic_regression *loadModel(const char *filename);
+    void extractModel(const char *filename);
 };
 
 #endif /*LOGISTIC_REGRESSION_HPP*/
