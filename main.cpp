@@ -85,8 +85,6 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
                 line.erase(0, id1.length()+1);
                 id2 = line.substr(0, line.find(","));
 
-
-                // std::cout << "(1)" << std::endl;
                 hashtab.getContentByKeyValue(id1)->merge(hashtab.getContentByKeyValue(id2)); 
             }
             else if (line.back() == '0') {// a,b,0
@@ -96,7 +94,6 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
                 line.erase(0, id1.length()+1);
                 id2 = line.substr(0, line.find(","));
 
-                // std::cout << "(2)" << std::endl;
                 hashtab.getContentByKeyValue(id1)->unsimilar(hashtab.getContentByKeyValue(id2));
             }
             else
@@ -165,7 +162,6 @@ int main(int argc, char** argv) {
         }
     }
 
-
     jsonParser parser;
     //initialize container structures
     hashtable<spec> hashtab(buckets);
@@ -182,19 +178,18 @@ int main(int argc, char** argv) {
         return -1; //if it failed stop
     }
 
-    //out pairs to file
-    if (extractPositivePairs(cliqueContainer, csvOutputFile) != 0) {
-        return -1; //if it failed stop
-    }
+    //out pairs to file //TODO uncomment
+    // if (extractPositivePairs(cliqueContainer, csvOutputFile) != 0) {
+    //     return -1; //if it failed stop
+    // }
 
     Index index(buckets);
     hashtable<json_index> json_index_hashtable(buckets);
     list<json_index> json_index_container;
     list<jsonObject> jsonContainer;
 
-    
     int trainSet = lines / 100 * 60;
-    if(make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets, folder, trainSet) != 0){
+    if (make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets, folder, trainSet) != 0){
         std::cout << "Error make tfidf 1" << std::endl;
         return -2;
     }
@@ -202,16 +197,14 @@ int main(int argc, char** argv) {
     int vec_count = index.get_words_counter();
     matrix training(trainSet, vec_count);
     int *y;
-    std::cout << "HOLA" << std::endl;
     y = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&training,trainSet);
-    std::cout << "HOLA" << std::endl;
-    for(int i=0; i<trainSet; i++){
-        std::cout << y[i] << ",";
-    }
-    std::cout << std::endl;
+    // for(int i=0; i<trainSet; i++){
+    //     std::cout << y[i] << ",";
+    // }
+    // std::cerr << std::endl;
     logistic_regression lr(2.0f, vec_count);
     std::cout << lr.epoch(training, y) << std::endl;
-    
+    delete[] y;
 
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);

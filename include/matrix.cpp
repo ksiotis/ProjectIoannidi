@@ -51,7 +51,7 @@ matrix *matrix::dot(matrix &a, matrix &b) {
         std::cerr << "second table of dot has many rows, using only the first" << std::endl;
 
     int rows = a.getRows();
-    int columns = a.getRows();
+    int columns = a.getColumns();
     matrix *returnable = new matrix(rows, 1);
     
     for (int i = 0; i < rows; i++) {

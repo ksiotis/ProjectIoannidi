@@ -423,7 +423,7 @@ int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_ind
     }
 
     int vec_count = index->get_words_counter();
-    int *y = new int[vec_count];
+    int *y = new int[lines];
 
     int currentLine = 0;
     std::string line;
