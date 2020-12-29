@@ -431,12 +431,12 @@ int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_ind
     return 0;
 }
 
-int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,matrix* training,int lines){
+int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string json_path,matrix* training,int end_line,int start_line){
     std::ifstream inputFile(csvPath);
     if (inputFile.is_open() == false) {
             throw "Can't open file!";
     }
-
+    int lines = end_line - start_line;
     unsigned int vec_count = index->get_words_counter();
     int *y = new int[lines];
 
@@ -465,9 +465,8 @@ int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_ind
             line.erase(0, id1.length()+1);
             id2 = line.substr(0, line.find(","));
             
-
-            get_vector_tfidf(index,json_index_hashtable->getContentByKeyValue(id1),json1);
-            get_vector_tfidf(index,json_index_hashtable->getContentByKeyValue(id2),json2);
+            make_get_vector_tfidf(index,json_index_hashtable,json_index_container,jsonContainer,buckets,id1,json_path,json1);
+            make_get_vector_tfidf(index,json_index_hashtable,json_index_container,jsonContainer,buckets,id2,json_path,json2);
             for (unsigned int i = 0; i < vec_count; i++) {
                 training->table[currentLine][i] = json1[i] > json2[i] ? json1[i] - json2[i] : json2[i] - json1[i];
             }
@@ -515,8 +514,10 @@ int read_index_csv(Index* index,std::string filename){
             id1 = line.substr(0, line.find(","));
             line.erase(0, id1.length()+1);
             dim = line.substr(0, line.find(","));
-            line.erase(0, id1.length()+1);
+            line.erase(0, dim.length()+1);
             idf = line;
+
+            std::cout << line << std::endl;
             int dimension = stoi(dim);
             float idf_num = stof(idf);
             IndexObject *obj = new IndexObject(id1,dimension,idf_num);
