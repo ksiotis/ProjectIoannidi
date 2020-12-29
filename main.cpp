@@ -203,7 +203,7 @@ int main(int argc, char** argv) {
     int *y;
     
     matrix training(trainSet, vec_count);
-    y = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&training,trainSet);
+    y = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&training,trainSet);
 
     logistic_regression lr(2.0f, vec_count);
     std::cout << lr.epoch(training, y) << std::endl;
