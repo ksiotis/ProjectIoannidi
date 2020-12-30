@@ -534,13 +534,10 @@ int read_index_csv(Index* index,std::string filename){
             line.erase(0, dim.length()+1);
             idf = line;
 
-            // std::cout << line << std::endl;
             int dimension = stoi(dim);
             float idf_num = stof(idf);
             IndexObject *obj = new IndexObject(id1,dimension,idf_num);
             index->insertObject(obj);
-            // std::cout << "(2)" << std::endl;
-            // TODO insert_indexObject(id,dim,idf)
 
         }
         return 1;

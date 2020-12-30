@@ -20,7 +20,7 @@ private:
     float idf; 
 public:
     IndexObject(std::string a);
-    IndexObject(std::string a,int dim, float idf);
+    IndexObject(std::string a,int dim, float idf); //used on reading a index.csv
     ~IndexObject();
 
     void raiseNt();
@@ -117,13 +117,27 @@ public:
 };
 
 
-
+// insert word on index/json
 void insert_word(Index* index,json_index* json,std::string word);
-void insert_word(json_index* json,std::string word);
+
+//insert word on json only
+void insert_word_json(json_index* json,std::string word);
+
+//get a vector from existing json
 void get_vector_tfidf(Index* index,json_index* json,float* vec);
+
+// create a json and return vector
 void make_get_vector_tfidf(Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string id,std::string path,float* vec);
+
+// make index/jsons
 int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets, std::string path, int lines = __INT_MAX__);
+
+// returns 1,0 base on csv and ids' absolute difference
 int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string json_path,matrix* training,int end_line,int start_line = 0);
+
+// extract index to file
 void write_out_index(Index* index,std::string csvOutputFile);
+
+// read index from file
 int read_index_csv(Index* index,std::string filename);
 #endif /* SPEC_HPP */
