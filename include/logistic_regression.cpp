@@ -14,9 +14,26 @@ float logistic_regression::compare(matrix &values, int *actual_values) {
     try {
         float sum = 0;
         for (int i = 0, rows = values.getRows(); i < rows; i++) {
-            sum += abs(values.table[i][0] - actual_values[i]);
+            sum += logistic_regression::abs(values.table[i][0] - actual_values[i]);
         }
         return sum;
+    }
+    catch(const std::exception& e) {
+        std::cerr << e.what() << '\n';
+        return -2;
+    }
+}
+
+float logistic_regression::accuracy(matrix &values, int *actual_values) {
+    //assumes actual_values has correct lenght*/
+    int count = 0;
+    try {
+        for (int i = 0, rows = values.getRows(); i < rows; i++) {
+            if ((values.table[i][0] < 0.5 ? 0 : 1) == actual_values[i]) {
+                count++;
+            }
+        }
+        return (float)(count) / values.getRows() * 100;
     }
     catch(const std::exception& e) {
         std::cerr << e.what() << '\n';
@@ -33,7 +50,7 @@ void logistic_regression::sigmoid(matrix &x) {
     }
     
     for (int i = 0; i < rows; i++) {
-        x.table[i][0] = 0.5f * x.table[i][0] / (1 + abs(x.table[i][0])) + 0.5f;
+        x.table[i][0] = 0.5f * x.table[i][0] / (1 + logistic_regression::abs(x.table[i][0])) + 0.5f;
     }
 }
 
@@ -83,6 +100,8 @@ matrix *logistic_regression::gradient(matrix &vectors, matrix &predictions, int 
 
     for (int i = 0; i < rows; i++) {
         float error = predictions.table[i][0] - y[i];
+        if (y[i] == 1)
+            error = error * 4;
         for (int j = 0; j < columns; j++) {
             thetas->table[0][j] += error * vectors.table[i][j];
         }
@@ -98,10 +117,10 @@ matrix *logistic_regression::predict(matrix &vectors) {
     }
 
     matrix *temp = matrix::dot(vectors, w);
-    int rows = vectors.getRows();
-    for (int i = 0; i < rows; i++) {
-        temp->table[i][0] += b.table[0][0];
-    }
+    // int rows = vectors.getRows();
+    // for (int i = 0; i < rows; i++) {
+    //     temp->table[i][0] += b.table[0][0];
+    // }
     sigmoid(temp);
     return temp;
 }
@@ -141,7 +160,7 @@ float logistic_regression::cost(int *y) {
     bool overflow = false; //flag to check if error overflows(could happen for too many rows)
     float error = 0;
     for (int i = 0, rows = predictions->getRows(); i < rows; i++) {
-        error += abs(predictions->table[i][0] - y[i]);//n+1
+        error += logistic_regression::abs(predictions->table[i][0] - y[i]);//n+1
         if (error < 0) {
             overflow = true;
             break;
@@ -149,7 +168,7 @@ float logistic_regression::cost(int *y) {
     }
     if (overflow) {
         for (int i = 0, rows = predictions->getRows(); i < rows; i++) {
-            error += abs(predictions->table[i][0] - y[i]) / rows;//2n
+            error += logistic_regression::abs(predictions->table[i][0] - y[i]) / rows;//2n
         }
     }
     else

@@ -210,7 +210,7 @@ int main(int argc, char** argv) {
     tst = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&test,lines,trainSet+validationSet);
 
     //TODO train 100 times
-    logistic_regression lr(2.0f, vec_count);
+    logistic_regression lr(0.05f, vec_count);
     float curr, prev = 1000000;
     // unsigned int i=0;
     for (int i = 0; i < 100; i++) {
@@ -218,8 +218,13 @@ int main(int argc, char** argv) {
 
         matrix *validationPredictions = lr.predict(validation);
         curr = lr.compare(*validationPredictions, vl);
-        std::cout << "Epoch " << i << "\t\tError " << curr << std::endl;
-        if (prev - curr < 0.002) {
+        std::cout << "Epoch " << i << " Error " << curr << std::endl;
+        std::cout << "Validation Accuracy: " << (float)lr.accuracy(*validationPredictions, vl) << '%' << std::endl;
+        std::cout << logistic_regression::abs(prev - curr) << std::endl;
+        matrix *predictions = lr.predict(test);
+        std::cout << "Test Accuracy: " << lr.accuracy(*predictions, tst) << '%' << std::endl;
+        if (logistic_regression::abs(prev - curr) < 0.0005) {
+            std::cout << logistic_regression::abs(prev - curr) << std::endl;
             break;
         }
         prev = curr;
@@ -228,12 +233,10 @@ int main(int argc, char** argv) {
     delete[] y;
     delete[] vl;
 
-    //TODO
-    matrix *predictions = lr.predict(test);
-    for(int i = 0;i < lines-trainSet-validationSet;i++){
-        std::cout << predictions->table[i][0] << std::endl;
-    }
-    delete predictions;
+    // matrix *predictions = lr.predict(test);
+    // std::cout << "Accuracy: " << lr.accuracy(*predictions, tst) << '%' << std::endl;
+    
+    // delete predictions;
     delete[] tst;
 
     lr.extractModel("model");
