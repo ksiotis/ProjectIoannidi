@@ -215,11 +215,9 @@ int main(int argc, char** argv) {
 
         matrix *validationPredictions = lr.predict(validation);
         curr = lr.compare(*validationPredictions, vl);
-        std::cout << "Epoch " << i << " Error " << curr << std::endl;
+        std::cout << "Epoch " << i << " Cost " << curr << std::endl;
         std::cout << "Validation Accuracy: " << (float)lr.accuracy(*validationPredictions, vl) << '%' << std::endl;
-        std::cout << logistic_regression::abs(prev - curr) << std::endl;
-        if (logistic_regression::abs(prev - curr) < 0.0005) {
-            std::cout << logistic_regression::abs(prev - curr) << std::endl;
+        if (logistic_regression::abs(prev - curr) < 1) {
             break;
         }
         prev = curr;
@@ -229,7 +227,7 @@ int main(int argc, char** argv) {
     delete[] vl;
 
     matrix *predictions = lr.predict(test);
-    std::cout << "Accuracy: " << lr.accuracy(*predictions, tst) << '%' << std::endl;
+    std::cout << "Test Accuracy: " << lr.accuracy(*predictions, tst) << '%' << std::endl;
     
     delete predictions;
     delete[] tst;

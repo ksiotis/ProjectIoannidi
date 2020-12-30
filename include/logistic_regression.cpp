@@ -146,8 +146,8 @@ float logistic_regression::epoch(matrix &vectors, int *y) {
         b.table[0][0] -= learningRate * thetas->table[i][cols-1];
     }
 
+    delete predictions;
     predictions = predict(vectors);
-
     float error = cost(y);
 
     delete thetas;
