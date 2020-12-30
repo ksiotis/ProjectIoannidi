@@ -102,7 +102,6 @@ int main(int argc, char** argv) {
     delete predictions;
     delete[] tst;
 
-
     //empty and delete container structures and dynamic data
     delete lr;
     jsonContainer.emptyList(true);

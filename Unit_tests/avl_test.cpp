@@ -6,13 +6,13 @@
 #include "../include/utilities.hpp"
 
 
-template <typename T>
-std::string T::* treeNode<T>::keyValue = &unit_testing::id;
+// template <typename T>
+// std::string T::* treeNode<T>::keyValue = &unit_testing::id;
 
 void test_tree_simple(void){
-    unit_testing a = unit_testing("aaaa");
-    unit_testing b = unit_testing("bbbb");
-    avlTree<unit_testing> tree = avlTree<unit_testing>();
+    generic a = generic("aaaa");
+    generic b = generic("bbbb");
+    avlTree<generic> tree = avlTree<generic>();
     tree.insert(&a);
     TEST_CHECK(tree.getCount() == 1);
     tree.insert(&b);
@@ -21,10 +21,10 @@ void test_tree_simple(void){
 }
 
 void test_tree_complex(void){
-    avlTree<unit_testing> tree = avlTree<unit_testing>();
+    avlTree<generic> tree = avlTree<generic>();
 
     for(int i = 0; i < 100; i++){
-        unit_testing *a = new unit_testing(std::to_string(i));
+        generic *a = new generic(std::to_string(i));
         tree.insert(a);
     }
     TEST_CHECK(tree.getCount() == 100);

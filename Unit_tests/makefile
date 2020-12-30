@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-std=c++11 -Wall -g3
 
-unit_test: spec_test jsonParser_test hashtable_test avl_test list_test
+unit_test: spec_test jsonParser_test hashtable_test avl_test list_test matrix_test logistic_regression_test
 
 spec_test: ../include/list.hpp ../include/spec.hpp spec_test.cpp spec.o utilities.o
 	$(CC) $(CFLAGS) spec_test.cpp ../builder/spec.o ../builder/utilities.o -o spec_test
@@ -21,6 +21,9 @@ list_test: ../include/list.hpp list_test.cpp
 matrix_test: matrix_test.cpp matrix.o
 	$(CC) $(CFLAGS) matrix_test.cpp ../builder/matrix.o -o matrix_test
 
+logistic_regression_test: logistic_regression_test.cpp logistic_regression.o
+	$(CC) $(CFLAGS) logistic_regression_test.cpp ../builder/matrix.o ../builder/logistic_regression.o -o logistic_regression_test
+	
 tf_idf_test: tf_idf_test.cpp tf_idf.o jsonParser.o utilities.o
 	$(CC) $(CFLAGS) tf_idf_test.cpp ../builder/jsonParser.o ../builder/utilities.o ../builder/tf_idf.o -o tf_idf_test
 
@@ -36,6 +39,9 @@ jsonParser.o: ../include/jsonParser.cpp ../include/jsonParser.hpp
 matrix.o: ../include/matrix.cpp
 	$(CC) $(CFLAGS) -c ../include/matrix.cpp -o ../builder/matrix.o
 
+logistic_regression.o: matrix.o ../include/logistic_regression.cpp
+	$(CC) $(CFLAGS) -c ../include/logistic_regression.cpp -o ../builder/logistic_regression.o
+	
 tf_idf.o: ../include/matrix.cpp
 	$(CC) $(CFLAGS) -c ../include/tf_idf.cpp -o ../builder/tf_idf.o
 
@@ -43,4 +49,4 @@ example.o: example.cpp
 	$(CC) $(CFLAGS) -c example.cpp -o ../builder/example.o
 
 clean:
-	rm -rf list_test avl_test hashtable_test spec_test jsonParser_test matrix_test tf_idf_test
+	rm -rf list_test avl_test hashtable_test spec_test jsonParser_test matrix_test logistic_regression_test tf_idf_test

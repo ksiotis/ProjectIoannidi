@@ -14,6 +14,8 @@ void test_nodes(void){
     TEST_CHECK(node1->getContent() == &a);
     TEST_CHECK(node1->getNext()->getContent() == &b);
 
+    delete node1;
+    delete node2;
 }
 
 void test_list(void){
@@ -27,7 +29,7 @@ void test_list(void){
     TEST_CHECK(li.search(7) == false);
     TEST_CHECK(li.search(10) == true);
     TEST_CHECK(li.removeStart() == a);
-    li.emptyList(1);
+    li.emptyList(true);
     TEST_CHECK(li.getCount() == 0);
 }
 
@@ -40,6 +42,8 @@ void test_merge(void){
     li2.insert(b);
     li1.merge(li1,li2);
     TEST_CHECK(li1.getCount() == 2);
+
+    li1.emptyList(true);
 }
 
 

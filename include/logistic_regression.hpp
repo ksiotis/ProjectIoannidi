@@ -14,12 +14,13 @@ private:
     matrix *predictions;
     // matrix j;
 
-    static void sigmoid(matrix &v);
-    static void sigmoid(matrix *v);
     // static float acusigmoid(float v);
     matrix *gradient(matrix &vectors, matrix &prediction, int *y);
     float cost(int *y);
 public:
+    static void sigmoid(matrix &v);
+    static void sigmoid(matrix *v);
+    
     static float abs(float v);
     static float compare(matrix &values, int *actual_values);
     static float accuracy(matrix &values, int *actual_values);
