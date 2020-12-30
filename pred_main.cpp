@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
     std::getline(input,line);
     int i=0;
     while (std::getline(input,line) && i++ < lines){
-        line.back() = predictions->table[i][0] < 0.5f ? '0' : '1';
+        line = line + "  Prediction : " + (predictions->table[i][0] < 0.5f ? '0' : '1');
         output << line << std::endl;
     }
     
