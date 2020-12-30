@@ -104,6 +104,7 @@ int main(int argc, char** argv) {
 
 
     //empty and delete container structures and dynamic data
+    delete lr;
     jsonContainer.emptyList(true);
     json_index_container.emptyList(true);
 /********* END OF CSV PART **********/

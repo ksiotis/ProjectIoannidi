@@ -21,6 +21,9 @@ list_test: ../include/list.hpp list_test.cpp
 matrix_test: matrix_test.cpp matrix.o
 	$(CC) $(CFLAGS) matrix_test.cpp ../builder/matrix.o -o matrix_test
 
+tf_idf_test: tf_idf_test.cpp tf_idf.o jsonParser.o utilities.o
+	$(CC) $(CFLAGS) tf_idf_test.cpp ../builder/jsonParser.o ../builder/utilities.o ../builder/tf_idf.o -o tf_idf_test
+
 spec.o: ../include/spec.cpp
 	$(CC) $(CFLAGS) -c ../include/spec.cpp -o ../builder/spec.o
 
@@ -33,8 +36,11 @@ jsonParser.o: ../include/jsonParser.cpp ../include/jsonParser.hpp
 matrix.o: ../include/matrix.cpp
 	$(CC) $(CFLAGS) -c ../include/matrix.cpp -o ../builder/matrix.o
 
+tf_idf.o: ../include/matrix.cpp
+	$(CC) $(CFLAGS) -c ../include/tf_idf.cpp -o ../builder/tf_idf.o
+
 example.o: example.cpp
 	$(CC) $(CFLAGS) -c example.cpp -o ../builder/example.o
 
 clean:
-	rm -rf list_test avl_test hashtable_test spec_test jsonParser_test matrix_test
+	rm -rf list_test avl_test hashtable_test spec_test jsonParser_test matrix_test tf_idf_test
