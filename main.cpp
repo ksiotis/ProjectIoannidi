@@ -30,7 +30,6 @@ void read_directory(const string name, hashtable<spec> &hashtab,
         std::cout << "no such dir  " << path << std::endl;
         return;
     }
-    // cout << path << endl;
     struct dirent * dp;
     while ((dp = readdir(dirp)) != NULL) {
         if( strcmp(dp->d_name,".") == 0 || strcmp(dp->d_name,"..") == 0){
@@ -44,7 +43,6 @@ void read_directory(const string name, hashtable<spec> &hashtab,
         }else { //if file
             // keep only the last folder + filename
             string delimiter = "/";
-
             size_t pos = 0;
             string token;
             while ((pos = path2.find(delimiter)) != string::npos) {
@@ -76,7 +74,6 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
         std::string line;
         getline(inputFile, line); //skip first line
         while (getline(inputFile, line)) { //for every line in file
-            // std::cout << line;
             counter++;
             if (line.back() == '1') {// a,b,1
                 //line is ending in 1
@@ -178,10 +175,10 @@ int main(int argc, char** argv) {
         return -1; //if it failed stop
     }
 
-    // out pairs to file //TODO uncomment
-    // if (extractPositivePairs(cliqueContainer, csvOutputFile) != 0) {
-    //     return -1; //if it failed stop
-    // }
+    // Extract pairs from our base
+    if (extractPositivePairs(cliqueContainer, csvOutputFile) != 0) {
+        return -1; //if it failed stop
+    }
 
     Index index(buckets);
     hashtable<json_index> json_index_hashtable(buckets);
@@ -209,7 +206,7 @@ int main(int argc, char** argv) {
     
     tst = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&test,lines,trainSet+validationSet);
 
-    //TODO train 100 times
+    //TODO
     logistic_regression lr(0.05f, vec_count);
     float curr, prev = 1000000;
     // unsigned int i=0;
@@ -221,8 +218,6 @@ int main(int argc, char** argv) {
         std::cout << "Epoch " << i << " Error " << curr << std::endl;
         std::cout << "Validation Accuracy: " << (float)lr.accuracy(*validationPredictions, vl) << '%' << std::endl;
         std::cout << logistic_regression::abs(prev - curr) << std::endl;
-        matrix *predictions = lr.predict(test);
-        std::cout << "Test Accuracy: " << lr.accuracy(*predictions, tst) << '%' << std::endl;
         if (logistic_regression::abs(prev - curr) < 0.0005) {
             std::cout << logistic_regression::abs(prev - curr) << std::endl;
             break;
@@ -233,10 +228,10 @@ int main(int argc, char** argv) {
     delete[] y;
     delete[] vl;
 
-    // matrix *predictions = lr.predict(test);
-    // std::cout << "Accuracy: " << lr.accuracy(*predictions, tst) << '%' << std::endl;
+    matrix *predictions = lr.predict(test);
+    std::cout << "Accuracy: " << lr.accuracy(*predictions, tst) << '%' << std::endl;
     
-    // delete predictions;
+    delete predictions;
     delete[] tst;
 
     lr.extractModel("model");
