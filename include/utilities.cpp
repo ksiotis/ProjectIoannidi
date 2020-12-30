@@ -35,8 +35,8 @@ std::string removeWord(std::string str, std::string word)
 
 
 
-unit_testing::unit_testing(std::string x){
-        id = x;
-    };
+// unit_testing::unit_testing(std::string x){
+//         id = x;
+//     };
     
-unit_testing::~unit_testing(){};
+// unit_testing::~unit_testing(){};

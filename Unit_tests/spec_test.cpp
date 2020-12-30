@@ -36,7 +36,6 @@ void negative_list_clique_test(void) {
     spec *spec2 = new spec("spec2", li);
     spec *spec3 = new spec("spec3", li);
     spec *spec4 = new spec("spec4", li);
-    spec *spec5 = new spec("spec5", li);
     TEST_CHECK(li.getCount() == 4);
 
     spec1->unsimilar(spec2);
@@ -70,6 +69,11 @@ void negative_list_clique_test(void) {
     // TEST_CHECK(spec1->getClique() == spec4->getClique());
     // TEST_CHECK(count1_content == 2 && count1_content == actualCount(spec1->getClique()->getContentList()));
     // TEST_CHECK(count1 == 2 && count1 == actualCount(spec1->getClique()->getNegativeList()));
+
+    delete spec1;
+    delete spec2;
+    delete spec3;
+    delete spec4;
 }
 
 

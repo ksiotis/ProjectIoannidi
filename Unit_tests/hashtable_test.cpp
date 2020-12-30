@@ -6,13 +6,13 @@
 #include "../include/utilities.hpp"
 
 
-template <typename T>
-std::string T::* treeNode<T>::keyValue = &unit_testing::id;
+// template <typename T>
+// std::string T::* treeNode<T>::keyValue = &unit_testing::id;
 
 void test_hashtable_simple(void){
-    unit_testing a = unit_testing("aaaa");
-    unit_testing b = unit_testing("bbbb");
-    hashtable<unit_testing> hashtab(3);
+    generic a = generic("aaaa");
+    generic b = generic("bbbb");
+    hashtable<generic> hashtab(3);
     hashtab.insert(&a);
     TEST_CHECK(hashtab.getTotalCount() == 1);
     hashtab.insert(&b);
@@ -21,10 +21,10 @@ void test_hashtable_simple(void){
 }
 
 void test_hashtable_complex(void){
-    hashtable<unit_testing> hashtab(3);
+    hashtable<generic> hashtab(3);
 
     for(int i = 0; i < 100; i++){
-        unit_testing *a = new unit_testing(std::to_string(i));
+        generic *a = new generic(std::to_string(i));
         hashtab.insert(a);
     }
     TEST_CHECK(hashtab.getTotalCount() == 100);

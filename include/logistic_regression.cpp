@@ -45,12 +45,14 @@ void logistic_regression::sigmoid(matrix &x) {
     /*aproximate sigmoid function, faster but less accurate*/
     int rows = x.getRows();
     int columns = x.getColumns();
-    if (columns != 1) {
-        std::cerr << "Provided wrong table sigmoid";
-    }
+    // if (columns != 1) {
+    //     std::cerr << "Provided wrong table sigmoid";
+    // }
     
     for (int i = 0; i < rows; i++) {
-        x.table[i][0] = 0.5f * x.table[i][0] / (1 + logistic_regression::abs(x.table[i][0])) + 0.5f;
+        for (int j = 0; j < columns; j++) {
+            x.table[i][j] = (0.5f * x.table[i][j]) / (1 + logistic_regression::abs(x.table[i][j])) + 0.5f;
+        }
     }
 }
 
@@ -73,9 +75,8 @@ logistic_regression::logistic_regression(float learningRate, int columns, bool r
             w.table[0][j] = (float)(rand())/RAND_MAX;
         }
         b.table[0][0] = (float)(rand())/RAND_MAX;
-
-        predictions = NULL;
     }
+    predictions = NULL;
 }
 
 logistic_regression::~logistic_regression() {
@@ -100,10 +101,8 @@ matrix *logistic_regression::gradient(matrix &vectors, matrix &predictions, int 
 
     for (int i = 0; i < rows; i++) {
         float error = predictions.table[i][0] - y[i];
-        if (y[i] == 1)
-            error = error * 4;
         for (int j = 0; j < columns; j++) {
-            thetas->table[0][j] += error * vectors.table[i][j];
+            thetas->table[0][j] += error * (y[i] == 0 ? 1 : 1.1) * vectors.table[i][j];
         }
         thetas->table[i][columns] += error;
     }
