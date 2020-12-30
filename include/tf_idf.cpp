@@ -94,12 +94,6 @@ void fix_dim_recursive(treeNode<IndexObject> *currentNode, int &counter) {
 }
 
 void Index::fix_dim(){
-    /*
-        Set a counter to zero
-        Go to each node of all the avl_nodes
-        run node->getcontent()->set_dim(counter); on that node
-        (raise counter on for the next node)
-    */
     int counter = 0;
 
     int buckets = hash->getBucketNumber();
@@ -161,8 +155,6 @@ int IndexObject::getDim(){return dim;}
 
 void IndexObject::find_setIdf(int n){idf = log10(float(n)/nt);}
 float IndexObject::getIdf(){return idf;}
-
-// void IndexObject::print(){std::cout << id << std::endl;}
 
 
 //~~~~~~~~~~~~~~~~~~~json_index~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -261,12 +253,10 @@ void get_vector_tfidf(Index* index,json_index* json,float* vec){
     listNode<json_indexObject> *current = json->get_container()->getStart();
     while (current != NULL) {
         word = current->getContent()->getId();
-        // std::cout << word;
         dimension = index->getDim(word);
         if(dimension != -1){
             vec[dimension] = current->getContent()->getTf() * index->getIdf(word);
         }
-        // std::cout << " dim: " << dimension << ", count:  " << current->getContent()->getCount() << ", idf: " << index->getIdf(word) << std::endl;
         current = current->getNext();
     }
 }
@@ -276,7 +266,6 @@ void insert_json(Index* index,hashtable<json_index>* json_index_hashtable,list<j
     if(!json_index_hashtable->isInside(id)){
         // Parse the json
         jsonParser parser;
-        // std::cout << "jsonContainer insert " << path1 << std::endl;
         path=id_to_path(id,path);
         jsonObject* json = parser.parse(path);
 
@@ -314,7 +303,6 @@ void make_get_vector_tfidf(Index* index,hashtable<json_index>* json_index_hashta
     if(!json_index_hashtable->isInside(id)){
         // Parse the json
         jsonParser parser;
-        // std::cout << "jsonContainer insert " << path1 << std::endl;
         path=id_to_path(id,path);
         jsonObject* json = parser.parse(path);
 
@@ -371,7 +359,6 @@ int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_ind
                 if(!json_index_hashtable->isInside(id1)){
                     // Parse the json
                     jsonParser parser;
-                    // std::cout << "jsonContainer insert " << path1 << std::endl;
                     jsonObject* json = parser.parse(path1);
 
                     // Clear data
@@ -403,7 +390,6 @@ int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_ind
                 if(!json_index_hashtable->isInside(id2)){
                     // Parse the json
                     jsonParser parser2;
-                    // std::cout << "jsonContainer insert " << path2 << std::endl;
                     jsonObject* json2 = parser2.parse(path2);
 
                     // Clear data
@@ -525,7 +511,6 @@ int read_index_csv(Index* index,std::string filename){
 
         std::string line;
         while (getline(inputFile, line)) { //for every line in file
-            // std::cout << line;
 
             std::string id1,dim,idf;
             id1 = line.substr(0, line.find(","));

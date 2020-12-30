@@ -234,7 +234,9 @@ int main(int argc, char** argv) {
     delete predictions;
     delete[] tst;
 
-    lr.extractModel("model.txt");
+    
+    const char *name = "model.txt";
+    lr.extractModel(name);
     write_out_index(&index,"index.csv");
 
     //empty and delete container structures and dynamic data
