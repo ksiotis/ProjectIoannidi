@@ -107,6 +107,7 @@ int readCSV(std::string csvPath, hashtable<spec> &hashtab) {
 }
 
 int extractPositivePairs(list<clique> &cliqueContainer, std::string csvOutputFile) {
+    int lines = 0;
     try {
         //check if output file already exists
         std::ifstream outfile;
@@ -123,7 +124,7 @@ int extractPositivePairs(list<clique> &cliqueContainer, std::string csvOutputFil
         //write pairs to file
         listNode<clique> *current = cliqueContainer.getStart();
         while (current != NULL) {
-            current->getContent()->writePairs(ofile);
+            current->getContent()->writePairs(ofile, lines);
             current = current->getNext();
         }
     }
@@ -131,7 +132,7 @@ int extractPositivePairs(list<clique> &cliqueContainer, std::string csvOutputFil
         std::cerr << e << '\n';
         return -1;
     }
-    return 0;
+    return lines;
 }
 
 int main(int argc, char** argv) {
@@ -166,17 +167,21 @@ int main(int argc, char** argv) {
     list<clique> cliqueContainer;
 
     //read directories to get ids and add them to the apropriate container structures
+    std::cout << "read_directory" << std::endl;
     read_directory(folder, hashtab, specContainer, cliqueContainer);
 
     /* read csv file and reorganize the cliques accordingly...
        and get the number of lines in file to split into train,test,eval */
+    std::cout << "readCSV" << std::endl;
     int lines = readCSV(csv_file, hashtab);
     if (lines < 0) {
         return -1; //if it failed stop
     }
 
     // Extract pairs from our base
-    if (extractPositivePairs(cliqueContainer, csvOutputFile) != 0) {
+    std::cout << "extractPositivePairs" << std::endl;
+    int positivelines = extractPositivePairs(cliqueContainer, csvOutputFile);
+    if (positivelines < 0) {
         return -1; //if it failed stop
     }
 
@@ -187,31 +192,42 @@ int main(int argc, char** argv) {
 
     int trainSet = lines / 100 * 60;
     int validationSet = lines / 100 * 20;
+    std::cout << "make_tf_idf" << std::endl;
     if (make_tf_idf(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets, folder, trainSet) != 0){
         std::cout << "Error make tfidf 1" << std::endl;
         return -2;
     }
+    write_out_index(&index,"index.csv");
+    // read_index_csv(&index, "index.csv");
+
 
     unsigned int vec_count = index.get_words_counter();
     int *y;
     int *vl;
     int *tst;
+    int *positiveVectors;
     matrix training(trainSet, vec_count);
     matrix validation(validationSet, vec_count);
     matrix test(lines-trainSet-validationSet, vec_count);
+    matrix positives(positivelines, vec_count);
 
     y = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&training,trainSet);
     
     vl = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&validation,trainSet+validationSet,trainSet);
     
     tst = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&test,lines,trainSet+validationSet);
+    
+    positiveVectors = transform_csv_to_vector(csvOutputFile,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&test,positivelines);
 
-    //TODO
-    logistic_regression lr(0.05f, vec_count);
+    logistic_regression lr(4.0f, vec_count);
     float curr, prev = 1000000;
-    // unsigned int i=0;
+    int batch_size = 10;
+    int *subsetY = new int[batch_size];
     for (int i = 0; i < 100; i++) {
-        lr.epoch(training, y);
+        matrix *subset2 = positives.randomRows(positiveVectors, batch_size, subsetY);
+        lr.epoch(*subset2, subsetY);
+        matrix *subset = training.randomRows(y, batch_size, subsetY);
+        lr.epoch(*subset, subsetY);
 
         matrix *validationPredictions = lr.predict(validation);
         curr = lr.compare(*validationPredictions, vl);
@@ -221,8 +237,11 @@ int main(int argc, char** argv) {
             break;
         }
         prev = curr;
+        delete subset;
+        delete subset2;
         delete validationPredictions;
     }
+    delete[] subsetY;
     delete[] y;
     delete[] vl;
 
@@ -235,7 +254,6 @@ int main(int argc, char** argv) {
     
     const char *name = "model.txt";
     lr.extractModel(name);
-    write_out_index(&index,"index.csv");
 
     //empty and delete container structures and dynamic data
     specContainer.emptyList(true);

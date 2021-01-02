@@ -18,6 +18,7 @@ public:
     static matrix *dot(matrix &a, matrix &b);
     // static matrix multiplication();
     matrix *row(int row);
+    matrix *randomRows(int *y, int rows, int *rowy);
 
     void print();
 };

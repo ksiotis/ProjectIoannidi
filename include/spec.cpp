@@ -131,7 +131,7 @@ void clique::addNegative(clique *second) { //TODO clean debuging
     } //if this is never shown, further optimization is possible
 }
 
-void clique::writePairs(std::ofstream &ofile) {
+void clique::writePairs(std::ofstream &ofile, int &lines) {
 /*outputs into <ofile> all the pairs of current clique in csv format
 ofile must be an ofstream opened outside of here*/
     listNode<spec> *first = content.getStart();
@@ -143,6 +143,7 @@ ofile must be an ofstream opened outside of here*/
             }
             ofile << first->getContent()->getId() <<
             "," << second->getContent()->getId() << ",1\n";
+            lines++;
 
             second = second->getNext();
         }

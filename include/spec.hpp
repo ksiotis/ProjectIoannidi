@@ -40,7 +40,7 @@ public:
 
     void merge(clique *second);
     void addNegative(clique *second);
-    void writePairs(std::ofstream &ofile);
+    void writePairs(std::ofstream &ofile, int &lines);
 };
 
 #endif /* SPEC_HPP */

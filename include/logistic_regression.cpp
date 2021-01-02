@@ -96,15 +96,14 @@ matrix *logistic_regression::gradient(matrix &vectors, matrix &predictions, int 
     int rows = vectors.getRows();
     int columns = vectors.getColumns();
 
-    // std::cout << rows << "  " << columns + 1 << std::endl;
     matrix *thetas = new matrix(rows, columns + 1); //extra position for b
 
     for (int i = 0; i < rows; i++) {
         float error = predictions.table[i][0] - y[i];
         for (int j = 0; j < columns; j++) {
-            thetas->table[0][j] += error * (y[i] == 0 ? 1 : 1.1) * vectors.table[i][j];
+            thetas->table[0][j] += error * (y[i] == 0 ? 1 : 1.5) * vectors.table[i][j] / rows;
         }
-        thetas->table[i][columns] += error;
+        thetas->table[i][columns] += error / rows;
     }
     return thetas;
 }
@@ -116,10 +115,10 @@ matrix *logistic_regression::predict(matrix &vectors) {
     }
 
     matrix *temp = matrix::dot(vectors, w);
-    // int rows = vectors.getRows();
-    // for (int i = 0; i < rows; i++) {
-    //     temp->table[i][0] += b.table[0][0];
-    // }
+    int rows = vectors.getRows();
+    for (int i = 0; i < rows; i++) {
+        temp->table[i][0] += b.table[0][0];
+    }
     sigmoid(temp);
     return temp;
 }

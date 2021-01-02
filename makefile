@@ -33,4 +33,4 @@ lrmain: utilities.o spec.o jsonParser.o tf_idf.o matrix.o logistic_regression.o
 	$(CC) $(CFLAGS) lrmain.cpp ./builder/*.o -o lrmain.out
 
 clean:
-	rm -rf master.out ./builder/*
+	rm -rf master.out ./builder/* Output_file index.csv model.txt

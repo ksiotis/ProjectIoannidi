@@ -77,6 +77,25 @@ matrix *matrix::row(int row) {
     return ret;
 }
 
+matrix *matrix::randomRows(int *y, int rows, int *rowy) {
+    /*row starts from 0*/
+    if (rows >= size[0]) {
+        std::cerr << "Too many rows: " << rows << std::endl;
+        return NULL;
+    }
+
+    matrix *ret = new matrix(rows, size[1]);
+
+    for (int i = 0; i < rows; i++) {
+        int selectedRow = rand() % size[0];
+        rowy[i] = y[i];
+        for (int j = 0; j < size[1]; j++) {
+            ret->table[i][j] = table[selectedRow][j];
+        }
+    }
+    return ret;
+}
+
 void matrix::print() {
     for (int i = 0; i < size[0]; i++) {
         std::cout << "row " << i << ":" << std::endl;
