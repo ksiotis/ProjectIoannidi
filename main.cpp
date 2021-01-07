@@ -219,7 +219,7 @@ int main(int argc, char** argv) {
     
     positiveVectors = transform_csv_to_vector(csvOutputFile,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&test,positivelines);
 
-    logistic_regression lr(4.0f, vec_count);
+    logistic_regression lr(5.0f, vec_count);
     float curr, prev = 1000000;
     int batch_size = 10;
     int *subsetY = new int[batch_size];
@@ -233,7 +233,7 @@ int main(int argc, char** argv) {
         curr = lr.compare(*validationPredictions, vl);
         std::cout << "Epoch " << i << " Cost " << curr << std::endl;
         std::cout << "Validation Accuracy: " << (float)lr.accuracy(*validationPredictions, vl) << '%' << std::endl;
-        if (logistic_regression::abs(prev - curr) < 1) {
+        if (logistic_regression::abs(prev - curr) < 10) {
             break;
         }
         prev = curr;
