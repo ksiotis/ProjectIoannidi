@@ -1,7 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
-// #include <cstring>
+#include <iostream>
 #include <string>
 
 template <typename T>
