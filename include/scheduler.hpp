@@ -23,21 +23,24 @@ public:
 
 
 class scheduler {
-private:
+public:
     int execution_threads;
     thread **pool;
     conditionVariable cond;
     bool running;
+    semaphore runningMutex;
     
     list<task> q;
-public:
     scheduler(int threads);
     ~scheduler();
 
+    bool getRunning();
+    int getCount();
+
     void addTask(task *myValue);
     task *popTask();
-
-    void *threadMain(void *argv);
 };
+
+void *threadMain(scheduler &sch, void *argv);
 
 #endif /*SCHEDULER_HPP*/

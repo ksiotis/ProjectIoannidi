@@ -7,7 +7,7 @@ class thread {
 private:
     pthread_t thread_id;
 public:
-    thread(void *(scheduler::*function_pointer)(void *), void *argv);
+    thread(void *(*function)(void *), void *argv);
     ~thread();
 };
 

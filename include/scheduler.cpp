@@ -29,46 +29,76 @@ scheduler::scheduler(int nthreads) :
     running(true) {
     pool = new thread*[execution_threads];
     for (int i = 0; i < execution_threads; i++) {
-        std::cout << "Creating threads" << std::endl;
-        pool[i] = new thread(&scheduler::threadMain), (void *)NULL);
-        std::cout << "Created thread " << pool[i];
+        pool[i] = new thread((void *(*)(void *))&threadMain, (void *)this);
     }
 }
 
 scheduler::~scheduler() {
+    runningMutex.lock();
+    running = false;
+    runningMutex.unlock();
+
+    std::cout << "Broadcasting..." << std::endl;
+    cond.broadcast();
+    for (int i = 0; i < execution_threads; i++) {
+        // std::cout << "waiting for " << pool[i] << ": " << std::flush;
+        delete pool[i];
+        // std::cout << "done" << std::endl;
+    }
+    delete[] pool;
     q.emptyList(true);
+    std::cout << "done" << std::endl;
+}
+
+bool scheduler::getRunning() {
+    runningMutex.lock();
+    bool ret = running;
+    runningMutex.unlock();
+
+    return ret;
+}
+
+int scheduler::getCount() {
+    cond.lock();
+    int ret = q.getCount();
+    cond.unlock();
+
+    return ret;
 }
 
 void scheduler::addTask(task *myValue) {
     cond.lock();
     q.insert(myValue);
     cond.unlock();
+
     cond.signal();
 }
 
 task *scheduler::popTask() {
-    cond.lock();
     task *returnable = q.removeStart();
-    cond.unlock();
     return returnable;
 }
 
-void *scheduler::threadMain(void *argv) {
-    while (running) {
+void *threadMain(scheduler &sch, void *argv) {
+    while (1) {
+        if (sch.getRunning() == 0 && sch.q.getCount() == 0) { //if it must end
 
-        //condition variable waiting
-        cond.lock();
-        while (!q.getCount()) {
-            cond.wait();
+            break; //end
         }
-
-        task *currentTask = popTask();
-
-        cond.unlock();
+        
+        //condition variable waiting
+        sch.cond.lock();
+        while (sch.getRunning() && sch.q.getCount() == 0) { //wait while queue is empty
+            sch.cond.wait();
+        }
+        task *currentTask = sch.popTask();
+        sch.cond.unlock();
 
         //run Task
-        currentTask->run();
-        delete currentTask;
+        if (currentTask != NULL) {
+            currentTask->run();
+            delete currentTask;
+        }
 
     }
 }

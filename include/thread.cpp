@@ -4,12 +4,13 @@
 // #include "scheduler.hpp"
 #include "thread.hpp"
 
-thread::thread(void *(scheduler::*function)(void *), void *argv) {
-    pthread_create(&thread_id, NULL, (void *(*)(void *))function, argv);
+thread::thread(void *(*function)(void *), void *argv) {
+
+    pthread_create(&thread_id, NULL, function, argv);
 }
 
 thread::~thread() {
-    std::cout << "Ending " << thread_id << std::endl;
+    // std::cout << "Ending " << thread_id << std::endl;
     pthread_join(thread_id, NULL);
 }
 

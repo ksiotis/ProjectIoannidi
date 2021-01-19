@@ -1,30 +1,37 @@
 #include <iostream>
+#include <cstring>
+#include <string>
+#include <cmath>
+// #include <unistd.h>
 
 #include "include/thread.hpp"
 #include "include/scheduler.hpp"
 
+// semaphore printMutex;
 void foo(void *argv) {
-    std::cout << (char *)argv << std::endl;
+    // printMutex.lock();    
+    for(int i=0; i<=100000000; i++);
+    int mine = *(int *)argv;
+
+    std::cout << log10(mine*mine <= 0 ? 1 : mine * mine) * log10(mine/10 <= 0 ? 1 : mine/10) << std::endl;
+    // printMutex.unlock();
 }
 
 
 int main() {
+    std::string str = "This is string #";
 
-    std::cout << "Before" << std::endl;
+    // char *currentString;
+    scheduler sch(16);
 
-    const char *test1 = "This is a test";
-    const char *test2 = "This is another test";
-    const char *test3 = "This is the final test";
+    for (int i = 0; i < 1000; i++) {
+        std::string currentString = str + std::to_string(i);
 
-    std::cout << "Creating threads" << std::endl;
-    scheduler sch(3);
-    std::cout << "Created threads" << std::endl;
-    list<task> l;
-    std::cout << "Creating tasks" << std::endl;
-    task *temp = new task(foo, (void *)test1);
-    sch.addTask(temp);
-    std::cout << "Created tasks" << std::endl;
+        void *currentCString = (void *)malloc(sizeof(int));
+        *(int *)currentCString = i;
 
+        sch.addTask(new task(foo, currentCString));
+    }
 
     return 0;
 }
