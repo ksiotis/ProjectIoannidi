@@ -7,15 +7,12 @@
 
 //~~~~~task~~~~~
 
-task::task(void (*foo)(void *), void *argv, void *target) :
+task::task(void (*foo)(void *), void *argv) :
     function_pointer(foo),
     arguments(argv) {
 }
 
-task::~task() {
-    if (arguments != NULL)
-        free(arguments);
-}
+task::~task() {}
 
 void task::run() {
     function_pointer(arguments);
@@ -101,4 +98,5 @@ void *threadMain(scheduler &sch, void *argv) {
         }
 
     }
+    return NULL;
 }

@@ -15,7 +15,7 @@ private:
     void (*function_pointer)(void *);
     void *arguments;
 public:
-    task(void (*function_pointer)(void *), void *arguments, void *target = NULL);
+    task(void (*function_pointer)(void *), void *arguments);
     ~task();
 
     void run();

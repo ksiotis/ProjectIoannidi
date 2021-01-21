@@ -1,6 +1,8 @@
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
+#include "scheduler.hpp"
+
 class matrix {
 private:
     int size[2];
@@ -16,9 +18,11 @@ public:
 
     // static float sum();
     static matrix *dot(matrix &a, matrix &b);
+    static matrix *dot(matrix &a, matrix &b, scheduler &sch);
     // static matrix multiplication();
     matrix *row(int row);
-    matrix *randomRows(int *y, int rows, int *rowy);
+    matrix *shuffleRows(int *y, int rows, int* &rowy);
+    matrix *shuffleRows(int *y, int rows, int* &rowy, scheduler &sch);
 
     void print();
 };

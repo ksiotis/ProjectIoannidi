@@ -12,6 +12,12 @@
 #include "include/jsonParser.hpp"
 #include "include/tf_idf.hpp"
 #include "include/logistic_regression.hpp"
+#include "include/thread.hpp"
+#include "include/scheduler.hpp"
+
+#define EPOCHS 1
+#define THREADS 10
+#define THREADING
 
 // template <typename T>
 // std::string T::* treeNode<T>::keyValue = &generic::id;
@@ -160,6 +166,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    scheduler sch(THREADS);
     jsonParser parser;
     //initialize container structures
     hashtable<spec> hashtab(buckets);
@@ -201,11 +208,13 @@ int main(int argc, char** argv) {
     // read_index_csv(&index, "index.csv");
 
 
+    std::cout << "vectorization..." << std::endl;
+
     unsigned int vec_count = index.get_words_counter();
     int *y;
     int *vl;
     int *tst;
-    int *positiveVectors;
+    // int *positiveVectors;
     matrix training(trainSet, vec_count);
     matrix validation(validationSet, vec_count);
     matrix test(lines-trainSet-validationSet, vec_count);
@@ -217,35 +226,64 @@ int main(int argc, char** argv) {
     
     tst = transform_csv_to_vector(csv_file,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&test,lines,trainSet+validationSet);
     
-    positiveVectors = transform_csv_to_vector(csvOutputFile,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&test,positivelines);
+    // positiveVectors = transform_csv_to_vector(csvOutputFile,&index,&json_index_hashtable,&json_index_container,&jsonContainer,buckets,folder,&test,positivelines);
 
-    logistic_regression lr(5.0f, vec_count);
+    //TODO reduce vec_count
+
+    std::cout << "logistic_regression..." << std::endl;
+
+    logistic_regression lr(0.03f, vec_count);
     float curr, prev = 1000000;
-    int batch_size = 10;
-    int *subsetY = new int[batch_size];
-    for (int i = 0; i < 100; i++) {
-        matrix *subset2 = positives.randomRows(positiveVectors, batch_size, subsetY);
-        lr.epoch(*subset2, subsetY);
-        matrix *subset = training.randomRows(y, batch_size, subsetY);
-        lr.epoch(*subset, subsetY);
-
+    int *subsetY;
+    for (int epoch = 0; epoch < EPOCHS; epoch++) {
+        // matrix *subset2 = positives.shuffleRows(positiveVectors, 0, subsetY);
+        // lr.epoch(*subset2, subsetY);
+        // delete[] subsetY;
+        // #ifdef THREADING
+        // matrix *shuffled = training.shuffleRows(y, 0, subsetY, sch);
+        // lr.epoch(*shuffled, subsetY, sch);
+        // delete[] subsetY;
+        // matrix *validationPredictions = lr.predict(validation, sch);
+        // curr = lr.compare(*validationPredictions, vl, sch);
+        // std::cout << "Epoch " << epoch+1 << " Cost " << curr << std::endl;
+        // std::cout << "Validation Accuracy: " << (float)lr.accuracy(*validationPredictions, vl, sch) << '%' << std::endl;
+        // #endif
+        #ifdef THREADING
+        matrix *shuffled = training.shuffleRows(y, 0, subsetY, sch);
+        for (int i = 0; i < shuffled->getRows(); i++) {
+            matrix *currentRow = shuffled->row(i);
+            lr.epoch(*currentRow, &(subsetY[i]), sch);
+            delete currentRow;
+        }
+        delete[] subsetY;
+        matrix *validationPredictions = lr.predict(validation, sch);
+        curr = lr.compare(*validationPredictions, vl, sch);
+        std::cout << "Epoch " << epoch+1 << " Cost " << curr << std::endl;
+        std::cout << "Validation Accuracy: " << (float)lr.accuracy(*validationPredictions, vl, sch) << '%' << std::endl;
+        #endif
+        #ifndef THREADING
+        matrix *shuffled = training.shuffleRows(y, 0, subsetY);
+        lr.epoch(*shuffled, subsetY);
+        delete[] subsetY;
         matrix *validationPredictions = lr.predict(validation);
         curr = lr.compare(*validationPredictions, vl);
-        std::cout << "Epoch " << i << " Cost " << curr << std::endl;
+        std::cout << "Epoch " << epoch+1 << " Cost " << curr << std::endl;
         std::cout << "Validation Accuracy: " << (float)lr.accuracy(*validationPredictions, vl) << '%' << std::endl;
-        if (logistic_regression::abs(prev - curr) < 10) {
+        #endif
+
+        if (logistic_regression::abs(prev - curr) < 0.1) {
             break;
         }
         prev = curr;
-        delete subset;
-        delete subset2;
+        delete shuffled;
+        // delete subset2;
         delete validationPredictions;
     }
-    delete[] subsetY;
     delete[] y;
     delete[] vl;
 
-    matrix *predictions = lr.predict(test);
+    // matrix *predictions = lr.predict(test);
+    matrix *predictions = lr.predict(test, sch);
     std::cout << "Test Accuracy: " << lr.accuracy(*predictions, tst) << '%' << std::endl;
     
     delete predictions;

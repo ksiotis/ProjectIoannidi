@@ -1,6 +1,8 @@
 #ifndef THREAD_HPP
 #define THREAD_HPP
 
+#include <pthread.h>
+
 class scheduler;
 
 class thread {
