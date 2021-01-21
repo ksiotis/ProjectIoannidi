@@ -177,9 +177,9 @@ void accuracyThreads(void *arg) {
 
     //main function
     int temp = 0;
-        if ((values[i][0] < 0.5 ? 0 : 1) == actual_values[i]) {
-            temp++;
-        }
+    if ((values[i][0] < 0.5 ? 0 : 1) == actual_values[i]) {
+        temp++;
+    }
     
     mutexCount->lock();
     *count += temp;
@@ -416,17 +416,20 @@ void updateThetasThreads(void *arg) {
     conditionVariable *cond = (conditionVariable *)argv[0];
     int *doneCounter = (int *)argv[1];
     int rows = *(int *)argv[2];
-    int j = *(int *)argv[3];
-    float **thetas = (float **)argv[4];
-    float *error = (float *)argv[5];
-    float **vectors = (float **)argv[6];
+    int start = *(int *)argv[3];
+    int end = *(int *)argv[4];
+    float **thetas = (float **)argv[5];
+    float *error = (float *)argv[6];
+    float **vectors = (float **)argv[7];
 
     //main function
-    float temp = 0;
-    for (int i = 0; i < rows; i++) {
-        temp += error[i] * vectors[i][j];
+    for (int j = start; j < end; j++) {
+        float temp = 0;
+        for (int i = 0; i < rows; i++) {
+            temp += error[i] * vectors[i][j];
+        }
+        thetas[0][j] += temp;
     }
-    thetas[0][j] += temp;
 
     cond->lock();
     if (--(*doneCounter) != 0) {
@@ -439,6 +442,7 @@ void updateThetasThreads(void *arg) {
 
     delete (int *)argv[2];
     delete (int *)argv[3];
+    delete (int *)argv[4];
     delete[] argv;
 }
 
@@ -451,6 +455,7 @@ matrix *logistic_regression::gradient(matrix &vectors, matrix &predictions, int 
     int columns = vectors.getColumns();
 
     matrix *thetas = new matrix(rows, columns);
+
 
     float *error = new float[rows];
 
@@ -483,26 +488,30 @@ matrix *logistic_regression::gradient(matrix &vectors, matrix &predictions, int 
     }
     doneMutex.unlock();
 
-    // for (int i = 0; i < rows; i++) {
-    //     for (int j = 0; j < columns; j++) {
-    //         error[i] = predictions.table[i][0] - y[i];
-    //     }
-    // }
-
     //~~~~~update thetas~~~~~~
     //prepair argument to pass
     // conditionVariable doneMutex;
     // int doneCounter = 0;
 
-    for (int j = 0; j < columns; j++) {
-        void **args = new void *[7];
+    int div = columns / sch.execution_threads;
+    int mod = columns % sch.execution_threads;
+
+    int end;
+    for (int start = 0; start < rows; start = end) {
+        if (start < (div + 1) * mod)
+            end = start + div + 1;
+        else
+            end = start + div;
+
+        void **args = new void *[8];
         args[0] = &doneMutex;
         args[1] = &doneCounter;
         args[2] = new int(rows); //delete inside
-        args[3] = new int(j); //delete inside
-        args[4] = thetas->table;
-        args[5] = error;
-        args[6] = vectors.table;
+        args[3] = new int(start); //delete inside
+        args[4] = new int(end); //delete inside
+        args[5] = thetas->table;
+        args[6] = error;
+        args[7] = vectors.table;
 
         doneMutex.lock(); //pass task to scheduler
         sch.addTask(new task(updateThetasThreads, (void *)args));
@@ -550,9 +559,8 @@ float logistic_regression::epoch(matrix &vectors, int *y) {
         // return -1;
     }
 
-    if (predictions != NULL)
-        delete predictions;
-    predictions = predict(vectors);
+    if (predictions == NULL)
+        predictions = predict(vectors);
 
     matrix *thetas = gradient(vectors, *predictions, y);
     
@@ -578,18 +586,21 @@ void updateWeightsEpochThreads(void *arg) {
     void **argv = (void **)arg;
     conditionVariable *cond = (conditionVariable *)argv[0];
     int *doneCounter = (int *)argv[1];
-    int rows = *(int *)argv[2];
-    int j = *(int *)argv[3];
-    float learningRate = *(float *)argv[4];
-    float **thetas = (float **)argv[5];
-    float **w = (float **)argv[6];
+    int start = *(int *)argv[2];
+    int end = *(int *)argv[3];
+    int rows = *(int *)argv[4];
+    float learningRate = *(float *)argv[5];
+    float **thetas = (float **)argv[6];
+    float **w = (float **)argv[7];
 
     //main function
     float temp = 0;
-    for (int i = 0; i < rows; i++) {
-        temp += learningRate * thetas[i][j];
+    for (int j = start; j < end; j++) {
+        for (int i = 0; i < rows; i++) {
+            temp += learningRate * thetas[i][j];
+        }
+        w[0][j] -= temp;
     }
-    w[0][j] -= temp;
 
 
     cond->lock();
@@ -603,21 +614,20 @@ void updateWeightsEpochThreads(void *arg) {
 
     delete (int *)argv[2];
     delete (int *)argv[3];
-    delete (float *)argv[4];
+    delete (int *)argv[4];
     delete[] argv;
 }
 
 float logistic_regression::epoch(matrix &vectors, int *y, scheduler &sch) {
+
     if (vectors.getColumns() != w.getColumns()) {
         std::cerr << "Invalid number of elements epoch" << std::endl;
         // return -1;
     }
-    std::cout << "1" << std::endl;
-    if (predictions != NULL)
-        delete predictions;
-    predictions = predict(vectors, sch);
+    if (predictions == NULL) {
+        predictions = predict(vectors, sch);
+    }
 
-    std::cout << "2" << std::endl;
     matrix *thetas = gradient(vectors, *predictions, y, sch);
     
     //update weights
@@ -625,19 +635,28 @@ float logistic_regression::epoch(matrix &vectors, int *y, scheduler &sch) {
     int cols = thetas->getColumns();
 
     //prepair argument to pass
-    std::cout << "3" << std::endl;
     conditionVariable doneMutex;
     int doneCounter = 0;
+    int div = cols / sch.execution_threads;
+    int mod = cols % sch.execution_threads;
 
-    for (int j = 0; j < cols; j++) {
-        void **args = new void *[7];
+    int end;
+    for (int start = 0; start < rows; start = end) {
+        if (start < (div + 1) * mod)
+            end = start + div + 1;
+        else
+            end = start + div;
+
+
+        void **args = new void *[8];
         args[0] = &doneMutex;
         args[1] = &doneCounter;
-        args[2] = new int(rows); //delete inside
-        args[3] = new int(j); //delete inside
-        args[4] = new float(learningRate); //delete inside
-        args[5] = thetas->table;
-        args[6] = w.table;
+        args[2] = new int(start); //delete inside
+        args[3] = new int(end); //delete inside
+        args[4] = new int(rows); //delete inside
+        args[5] = &learningRate;
+        args[6] = thetas->table;
+        args[7] = w.table;
 
         doneMutex.lock(); //pass task to scheduler
         sch.addTask(new task(updateWeightsEpochThreads, (void *)args));
@@ -645,7 +664,6 @@ float logistic_regression::epoch(matrix &vectors, int *y, scheduler &sch) {
         doneMutex.unlock();
     }
 
-    std::cout << "4" << std::endl;
     //wait for all tasks to finish
     doneMutex.lock();
     while (doneCounter > 0) {
@@ -656,6 +674,7 @@ float logistic_regression::epoch(matrix &vectors, int *y, scheduler &sch) {
 
     delete predictions;
     predictions = predict(vectors, sch);
+    // predictions = predict(vectors, sch);
     float error = cost(y, sch);
 
     delete thetas;
