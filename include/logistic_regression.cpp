@@ -674,8 +674,7 @@ float logistic_regression::epoch(matrix &vectors, int *y, scheduler &sch) {
 
     delete predictions;
     predictions = predict(vectors, sch);
-    // predictions = predict(vectors, sch);
-    float error = cost(y, sch);
+    float error = cost(y);
 
     delete thetas;
     return error;

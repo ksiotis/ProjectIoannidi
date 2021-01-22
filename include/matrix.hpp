@@ -20,7 +20,8 @@ public:
     static matrix *dot(matrix &a, matrix &b);
     static matrix *dot(matrix &a, matrix &b, scheduler &sch);
     // static matrix multiplication();
-    matrix *row(int row);
+    matrix *rows(int row, int batchSize = 1);
+    matrix *rows(int row,  int end, scheduler &sch);
     matrix *shuffleRows(int *y, int rows, int* &rowy);
     matrix *shuffleRows(int *y, int rows, int* &rowy, scheduler &sch);
 

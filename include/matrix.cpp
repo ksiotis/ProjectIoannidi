@@ -139,17 +139,111 @@ matrix *matrix::dot(matrix &a, matrix &b, scheduler &sch) {
     return returnable;
 }
 
-matrix *matrix::row(int row) {
+matrix *matrix::rows(int start, int end) {
     /*row starts from 0*/
-    if (row >= size[0]) {
+    int rows = size[0];
+    int columns = size[1];
+    if (start >= rows) {
         std::cerr << "No such row in matrix";
         return NULL;
     }
+    if (end > rows)
+        end = rows;
 
-    matrix *ret = new matrix(1, size[1]);
-    for (int i = 0; i < size[1]; i++) {
-        ret->table[0][i] = table[row][i];
+    matrix *ret = new matrix(end - start, columns);
+    for (int j = 0; j < columns; j++) {
+        for (int i = start; i < end; i++) {
+            ret->table[i-start][j] = table[i][j];
+        }
     }
+    return ret;
+}
+
+void matrixRowThreads(void *arg) {
+    //get arguments
+    void **argv = (void **)arg;
+    conditionVariable *cond = (conditionVariable *)argv[0];
+    int *doneCounter = (int *)argv[1];
+    int startj = *(int *)argv[2];
+    int endj = *(int *)argv[3];
+    int starti = *(int *)argv[4];
+    int endi = *(int *)argv[5];
+    float **source = (float **)argv[6];
+    float **destination = (float **)argv[7];
+
+    //main function
+    for (int i = starti; i < endi; i++) {
+        for (int j = startj; j < endj; j++) {
+            destination[i - starti][j] = source[i][j];
+        }
+    }
+
+    cond->lock();
+    if (--(*doneCounter) != 0) {
+        cond->unlock();
+    }
+    else {
+        cond->unlock();
+        cond->signal();
+    }
+
+    delete (int *)argv[2];
+    delete (int *)argv[3];
+    delete (int *)argv[4];
+    delete (int *)argv[5];
+    delete[] argv;
+}
+
+matrix *matrix::rows(int starti, int endi, scheduler &sch) {
+    /*starti starts from 0*/
+    int columns = size[1];
+    int rows = size[0];
+    if (starti >= rows) {
+        std::cerr << "No such row in matrix";
+        return NULL;
+    }
+    if (endi > rows)
+        endi = rows;
+
+    matrix *ret = new matrix(endi - starti, columns);
+
+    //prepare arguments to pass
+    conditionVariable doneMutex;
+    int doneCounter = 0;
+
+    int div = columns / sch.execution_threads;
+    int mod = columns % sch.execution_threads;
+
+    int endj;
+    for (int startj = 0; startj < columns; startj = endj) {
+        if (startj < (div + 1) * mod)
+            endj = startj + div + 1;
+        else
+            endj = startj + div;
+
+        void **args = new void *[8];
+        args[0] = &doneMutex;
+        args[1] = &doneCounter;
+        args[2] = new int(startj); //delete inside
+        args[3] = new int(endj); //delete inside
+        args[4] = new int(starti); //delete inside
+        args[5] = new int(endi); //delete inside
+        args[6] = this->table;
+        args[7] = ret->table;
+
+        doneMutex.lock(); //pass task to scheduler
+        sch.addTask(new task(matrixRowThreads, (void *)args));
+        doneCounter++;
+        doneMutex.unlock();
+    }
+
+    //wait for all tasks to finish
+    doneMutex.lock();
+    while (doneCounter > 0) {
+        doneMutex.wait();
+    }
+    doneMutex.unlock();
+
     return ret;
 }
 

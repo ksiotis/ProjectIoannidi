@@ -165,8 +165,9 @@ int main(int argc, char** argv) {
             return -1;
         }
     }
-
-    scheduler sch(THREADS);
+    #ifdef THREADING
+        scheduler sch(THREADS);
+    #endif
     jsonParser parser;
     //initialize container structures
     hashtable<spec> hashtab(buckets);
@@ -236,26 +237,19 @@ int main(int argc, char** argv) {
     float curr, prev = 1000000;
     int *subsetY;
     for (int epoch = 0; epoch < EPOCHS; epoch++) {
-        // matrix *subset2 = positives.shuffleRows(positiveVectors, 0, subsetY);
-        // lr.epoch(*subset2, subsetY);
-        // delete[] subsetY;
-        // #ifdef THREADING
-        // matrix *shuffled = training.shuffleRows(y, 0, subsetY, sch);
-        // lr.epoch(*shuffled, subsetY, sch);
-        // delete[] subsetY;
-        // matrix *validationPredictions = lr.predict(validation, sch);
-        // curr = lr.compare(*validationPredictions, vl, sch);
-        // std::cout << "Epoch " << epoch+1 << " Cost " << curr << std::endl;
-        // std::cout << "Validation Accuracy: " << (float)lr.accuracy(*validationPredictions, vl, sch) << '%' << std::endl;
-        // #endif
         #ifdef THREADING
         matrix *shuffled = training.shuffleRows(y, 0, subsetY, sch);
-        for (int i = 0; i < shuffled->getRows(); i++) {
-            matrix *currentRow = shuffled->row(i);
-            lr.epoch(*currentRow, &(subsetY[i]), sch);
-            delete currentRow;
+        int batchSize = 512;
+        std::cout << "Entering loop" << std::endl;
+        for (int i = 0; i < shuffled->getRows(); i += batchSize) {
+            std::cout << "Rows" << std::endl;
+            matrix *currentRows = shuffled->rows(i, i + batchSize, sch);
+            std::cout << "Epoch" << std::endl;
+            lr.epoch(*currentRows, &(subsetY[i]), sch);
+            delete currentRows;
         }
         delete[] subsetY;
+        std::cout << "Exited loop" << std::endl;
         matrix *validationPredictions = lr.predict(validation, sch);
         curr = lr.compare(*validationPredictions, vl, sch);
         std::cout << "Epoch " << epoch+1 << " Cost " << curr << std::endl;
@@ -263,7 +257,11 @@ int main(int argc, char** argv) {
         #endif
         #ifndef THREADING
         matrix *shuffled = training.shuffleRows(y, 0, subsetY);
-        lr.epoch(*shuffled, subsetY);
+        for (int i = 0; i < shuffled->getRows(); i += batchSize) {
+            matrix *currentRows = shuffled->rows(i, batchSize);
+            lr.epoch(*currentRows, &(subsetY[i]));
+            delete currentRows;
+        }
         delete[] subsetY;
         matrix *validationPredictions = lr.predict(validation);
         curr = lr.compare(*validationPredictions, vl);
