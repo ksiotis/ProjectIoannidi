@@ -18,8 +18,6 @@ private:
     // static float acusigmoid(float v);
     matrix *gradient(matrix &vectors, matrix &prediction, int *y);
     matrix *gradient(matrix &vectors, matrix &prediction, int *y, scheduler &sch);
-    float cost(int *y);
-    float cost(int *y, scheduler &sch);
 public:
     static void sigmoid(matrix &v);
     static void sigmoid(matrix &v, scheduler &sch);
@@ -38,8 +36,8 @@ public:
     matrix *getWeights();
     matrix *getBias();
 
-    float epoch(matrix &vectors, int *y);
-    float epoch(matrix &vectors, int *y, scheduler &sch);
+    void epoch(matrix &vectors, int *y);
+    void epoch(matrix &vectors, int *y, scheduler &sch);
     matrix *predict(matrix &vectors);
     matrix *predict(matrix &vectors, scheduler &sch);
 

@@ -553,16 +553,23 @@ matrix *logistic_regression::predict(matrix &vectors, scheduler &sch) {
     return temp;
 }
 
-float logistic_regression::epoch(matrix &vectors, int *y) {
+void logistic_regression::epoch(matrix &vectors, int *y) {
     if (vectors.getColumns() != w.getColumns()) {
         std::cerr << "Invalid number of elements epoch" << std::endl;
         // return -1;
     }
 
-    if (predictions == NULL)
-        predictions = predict(vectors);
+    if (predictions != NULL)
+        delete predictions;
+    predictions = predict(vectors);
+    if (predictions->getRows() != vectors.getRows()) {
+        std::cerr << "predictions mismatch" << std::endl;
+    }
 
     matrix *thetas = gradient(vectors, *predictions, y);
+    if (thetas->getRows() != vectors.getRows()) {
+        std::cerr << "thetas mismatch" << std::endl;
+    }
     
     //update weights
     int rows = thetas->getRows();
@@ -573,12 +580,7 @@ float logistic_regression::epoch(matrix &vectors, int *y) {
         }
     }
 
-    delete predictions;
-    predictions = predict(vectors);
-    float error = cost(y);
-
     delete thetas;
-    return error;
 }
 
 void updateWeightsEpochThreads(void *arg) {
@@ -618,15 +620,15 @@ void updateWeightsEpochThreads(void *arg) {
     delete[] argv;
 }
 
-float logistic_regression::epoch(matrix &vectors, int *y, scheduler &sch) {
+void logistic_regression::epoch(matrix &vectors, int *y, scheduler &sch) {
 
     if (vectors.getColumns() != w.getColumns()) {
         std::cerr << "Invalid number of elements epoch" << std::endl;
         // return -1;
     }
-    if (predictions == NULL) {
-        predictions = predict(vectors, sch);
-    }
+    if (predictions != NULL)
+        delete predictions;
+    predictions = predict(vectors, sch);
 
     matrix *thetas = gradient(vectors, *predictions, y, sch);
     
@@ -671,96 +673,7 @@ float logistic_regression::epoch(matrix &vectors, int *y, scheduler &sch) {
     }
     doneMutex.unlock();
 
-
-    delete predictions;
-    predictions = predict(vectors, sch);
-    float error = cost(y);
-
     delete thetas;
-    return error;
-}
-
-float logistic_regression::cost(int *y) {
-    float L = 0;
-    for (int i = 0, rows = predictions->getRows(); i < rows; i++) {
-        if (y[i])
-            L += log10(predictions->table[i][0] - y[i]);
-        else
-            L += log10(1 - predictions->table[i][0]);
-    }
-
-    return L;
-}
-
-void costThread(void *arg) {
-    //get arguments
-    void **argv = (void **)arg;
-    conditionVariable *cond = (conditionVariable *)argv[0];
-    int *doneCounter = (int *)argv[1];
-    int i = *(int *)argv[2];
-    float *y = (float *)argv[3];
-    int *L = (int *)argv[4];
-    semaphore *semaphoreL = (semaphore *)argv[5];
-    float **table = (float **)argv[6];
-
-    //main function
-    float temp;
-    if (y)
-        temp = log10(table[i][0] - y[i]);
-    else
-        temp = log10(1 - table[i][0]);
-
-    semaphoreL->lock();
-    *L += temp;
-    semaphoreL->unlock();
-
-    cond->lock();
-    if (--(*doneCounter) != 0) {
-        cond->unlock();
-    }
-    else {
-        cond->unlock();
-        cond->signal();
-    }
-
-    delete (int *)argv[2];
-    delete[] argv;
-}
-
-float logistic_regression::cost(int *y, scheduler &sch) {
-    float L = 0;
-    semaphore Lmutex;
-    int rows = predictions->getRows();
-
-    //prepair argument to pass
-    conditionVariable doneMutex;
-    int doneCounter = 0;
-
-    for (int i = 0; i < rows; i++) {
-
-        void **args = new void *[7];
-        args[0] = &doneMutex;
-        args[1] = &doneCounter;
-        args[2] = new int(i); //delete inside
-        args[3] = y;
-        args[4] = &L;
-        args[5] = &Lmutex;
-        args[6] = predictions->table;
-
-        doneMutex.lock(); //pass task to scheduler
-        sch.addTask(new task(costThread, (void *)args));
-        doneCounter++;
-        doneMutex.unlock();
-    }
-
-    //wait for all tasks to finish
-    doneMutex.lock();
-    while (doneCounter > 0) {
-        doneMutex.wait();
-    }
-    doneMutex.unlock();
-
-    return L;
 }
 
 logistic_regression *logistic_regression::loadModel(const char *filename) {

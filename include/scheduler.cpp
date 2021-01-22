@@ -35,16 +35,18 @@ scheduler::~scheduler() {
     running = false;
     runningMutex.unlock();
 
-    std::cout << "Broadcasting..." << std::endl;
+    std::cout << "Broadcasting threads to finish..." << std::endl;
     cond.broadcast();
     for (int i = 0; i < execution_threads; i++) {
+        cond.broadcast();
         // std::cout << "waiting for " << pool[i] << ": " << std::flush;
         delete pool[i];
         // std::cout << "done" << std::endl;
+
     }
     delete[] pool;
     q.emptyList(true);
-    std::cout << "done" << std::endl;
+    std::cout << "All threads joined" << std::endl;
 }
 
 bool scheduler::getRunning() {
@@ -98,5 +100,6 @@ void *threadMain(scheduler &sch, void *argv) {
         }
 
     }
+    sch.cond.signal();
     return NULL;
 }

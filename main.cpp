@@ -15,7 +15,7 @@
 #include "include/thread.hpp"
 #include "include/scheduler.hpp"
 
-#define EPOCHS 1
+#define EPOCHS 10
 #define THREADS 10
 #define THREADING
 
@@ -233,23 +233,19 @@ int main(int argc, char** argv) {
 
     std::cout << "logistic_regression..." << std::endl;
 
-    logistic_regression lr(0.03f, vec_count);
+    logistic_regression lr(0.4f, vec_count);
     float curr, prev = 1000000;
     int *subsetY;
     for (int epoch = 0; epoch < EPOCHS; epoch++) {
         #ifdef THREADING
         matrix *shuffled = training.shuffleRows(y, 0, subsetY, sch);
         int batchSize = 512;
-        std::cout << "Entering loop" << std::endl;
         for (int i = 0; i < shuffled->getRows(); i += batchSize) {
-            std::cout << "Rows" << std::endl;
             matrix *currentRows = shuffled->rows(i, i + batchSize, sch);
-            std::cout << "Epoch" << std::endl;
-            lr.epoch(*currentRows, &(subsetY[i]), sch);
+            lr.epoch(*currentRows, &(subsetY[i]));
             delete currentRows;
         }
         delete[] subsetY;
-        std::cout << "Exited loop" << std::endl;
         matrix *validationPredictions = lr.predict(validation, sch);
         curr = lr.compare(*validationPredictions, vl, sch);
         std::cout << "Epoch " << epoch+1 << " Cost " << curr << std::endl;
@@ -257,8 +253,11 @@ int main(int argc, char** argv) {
         #endif
         #ifndef THREADING
         matrix *shuffled = training.shuffleRows(y, 0, subsetY);
+        int batchSize = 512;
+        // int mycount = 0; // bebugging
         for (int i = 0; i < shuffled->getRows(); i += batchSize) {
-            matrix *currentRows = shuffled->rows(i, batchSize);
+            // mycount++; // bebugging
+            matrix *currentRows = shuffled->rows(i, i + batchSize);
             lr.epoch(*currentRows, &(subsetY[i]));
             delete currentRows;
         }
@@ -280,8 +279,8 @@ int main(int argc, char** argv) {
     delete[] y;
     delete[] vl;
 
-    // matrix *predictions = lr.predict(test);
-    matrix *predictions = lr.predict(test, sch);
+    matrix *predictions = lr.predict(test);
+    // matrix *predictions = lr.predict(test, sch);
     std::cout << "Test Accuracy: " << lr.accuracy(*predictions, tst) << '%' << std::endl;
     
     delete predictions;
