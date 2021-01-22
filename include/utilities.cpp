@@ -41,6 +41,12 @@ void swap(float* a, float* b)
     *b = t;  
 }  
   
+void strings_swap(std::string* a, std::string* b){
+    std::string t = *a;
+    *a = *b;
+    *b = t;
+}
+
 /* This function takes last element as pivot, places  
 the pivot element at its correct position in sorted  
 array, and places all smaller (smaller than pivot)  
@@ -54,14 +60,15 @@ int partition (float arr[],std::string str_arr[], int low, int high)
     for (int j = low; j <= high - 1; j++)  
     {  
         // If current element is smaller than the pivot  
-        if (arr[j] < pivot)  
+        if (arr[j] > pivot)  
         {  
             i++; // increment index of smaller element  
             swap(&arr[i], &arr[j]);
-            std::swap(str_arr[i],str_arr[j]);
+            strings_swap(&str_arr[i], &str_arr[j]);
         }  
     }  
-    swap(&arr[i + 1], &arr[high]);  
+    swap(&arr[i + 1], &arr[high]);
+    strings_swap(&str_arr[i + 1], &str_arr[high]);
     return (i + 1);  
 }  
   
@@ -86,7 +93,7 @@ void quickSort(float arr[],std::string str_arr[],int low, int high)
 
 //   How to use
 // int n = sizeof(arr) / sizeof(arr[0]);
-// quickSort(arr, 0, n - 1);
+// quickSort(arr, str_arr, 0, n - 1);
 
 
 // unit_testing::unit_testing(std::string x){

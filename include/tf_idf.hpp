@@ -12,6 +12,51 @@
 #include "jsonParser.hpp"
 #include "matrix.hpp"
 
+class json_indexObject: public generic{
+private:
+    int count; // number of time word appears inside the specific json
+    float tf;
+public:
+    json_indexObject(std::string a);
+    ~json_indexObject();
+
+    void raiseCount();
+    int getCount();
+
+    void find_setTf(int n);
+    float getTf();
+
+};
+
+class json_index: public generic{
+private:
+    hashtable<json_indexObject> *hash;
+    list<json_indexObject> *container;
+    unsigned int words_counter;
+public:
+    json_index(std::string name,int buckets);
+    ~json_index();
+
+    list<json_indexObject>* get_container();
+
+
+    void insert(std::string key);
+
+    bool isInside(std::string key);
+
+    void raiseCount(std::string key);
+    int getCount(std::string key);
+
+    void fix_Tf();
+    float getTf(std::string key);
+};
+
+
+// 
+// 
+// 
+// 
+// 
 
 class IndexObject: public generic {
 private:
@@ -63,7 +108,7 @@ public:
     void raiseNt(std::string key);
     int getNt(std::string key);
 
-    void fix_dim();
+    void fix_dim(list<json_index>* json_index_container);
     int getDim(std::string key);
 
     void fix_idf();
@@ -77,44 +122,7 @@ public:
 
 //************** INDEX SEPERATION LINE ***************
 
-class json_indexObject: public generic{
-private:
-    int count; // number of time word appears inside the specific json
-    float tf;
-public:
-    json_indexObject(std::string a);
-    ~json_indexObject();
 
-    void raiseCount();
-    int getCount();
-
-    void find_setTf(int n);
-    float getTf();
-
-};
-
-class json_index: public generic{
-private:
-    hashtable<json_indexObject> *hash;
-    list<json_indexObject> *container;
-    unsigned int words_counter;
-public:
-    json_index(std::string name,int buckets);
-    ~json_index();
-
-    list<json_indexObject>* get_container();
-
-
-    void insert(std::string key);
-
-    bool isInside(std::string key);
-
-    void raiseCount(std::string key);
-    int getCount(std::string key);
-
-    void fix_Tf();
-    float getTf(std::string key);
-};
 
 
 // insert word on index/json
