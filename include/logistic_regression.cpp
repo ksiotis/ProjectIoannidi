@@ -39,10 +39,11 @@ void compareThreads(void *arg) {
     float temp = 0;
     for (int i = start; i < end; i++) {
         if (actual_values[i])
-            temp += log10(values[i][0] - actual_values[i]);
+            temp += log10(values[i][0]);
         else
             temp += log10(1 - values[i][0]);
     }
+    temp /= (end - start);
     
     mutexL->lock();
     *L += temp;

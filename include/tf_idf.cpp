@@ -107,19 +107,6 @@ void reset_dim_recursive(treeNode<IndexObject> *currentNode) {
     }
 }
 
-
-
-
-void printArray(float arr[] ,std::string str_arr[] , unsigned int size , std::string file)  
-{  
-    std::ofstream myfile;
-    myfile.open (file);
-    unsigned int i;  
-    for (i = 0; i < size; i++)  
-        myfile << str_arr[i] << ":" << arr[i] << std::endl;
-    myfile.close();
-}  
-
 void Index::fix_dim(list<json_index>* json_index_container){
     // make dims normally
     int counter = 0;
@@ -164,9 +151,7 @@ void Index::fix_dim(list<json_index>* json_index_container){
     }
 
     // sort
-    printArray(tfidf,str_arr,1000,"before_quick");
     quickSort(tfidf, str_arr , 0, words_counter-1);
-    printArray(tfidf,str_arr,1000,"after_quick");
 
     //reset all dims to -1
     for (int i = 0; i < buckets; i++) {

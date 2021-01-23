@@ -17,7 +17,6 @@
 
 #define EPOCHS 10
 #define THREADS 10
-#define THREADING
 
 // template <typename T>
 // std::string T::* treeNode<T>::keyValue = &generic::id;
@@ -165,9 +164,8 @@ int main(int argc, char** argv) {
             return -1;
         }
     }
-    #ifdef THREADING
-        scheduler sch(THREADS);
-    #endif
+
+    scheduler sch(THREADS);
     jsonParser parser;
     //initialize container structures
     hashtable<spec> hashtab(buckets);
@@ -233,16 +231,16 @@ int main(int argc, char** argv) {
 
     std::cout << "logistic_regression..." << std::endl;
 
-    logistic_regression lr(0.4f, vec_count);
+    logistic_regression lr(0.3f, vec_count);
     float curr, prev = 1000000;
     int *subsetY;
     for (int epoch = 0; epoch < EPOCHS; epoch++) {
-        #ifdef THREADING
+
         matrix *shuffled = training.shuffleRows(y, 0, subsetY, sch);
         int batchSize = 512;
         for (int i = 0; i < shuffled->getRows(); i += batchSize) {
             matrix *currentRows = shuffled->rows(i, i + batchSize, sch);
-            lr.epoch(*currentRows, &(subsetY[i]));
+            lr.epoch(*currentRows, &(subsetY[i]), sch);
             delete currentRows;
         }
         delete[] subsetY;
@@ -250,25 +248,8 @@ int main(int argc, char** argv) {
         curr = lr.compare(*validationPredictions, vl, sch);
         std::cout << "Epoch " << epoch+1 << " Cost " << curr << std::endl;
         std::cout << "Validation Accuracy: " << (float)lr.accuracy(*validationPredictions, vl, sch) << '%' << std::endl;
-        #endif
-        #ifndef THREADING
-        matrix *shuffled = training.shuffleRows(y, 0, subsetY);
-        int batchSize = 512;
-        // int mycount = 0; // bebugging
-        for (int i = 0; i < shuffled->getRows(); i += batchSize) {
-            // mycount++; // bebugging
-            matrix *currentRows = shuffled->rows(i, i + batchSize);
-            lr.epoch(*currentRows, &(subsetY[i]));
-            delete currentRows;
-        }
-        delete[] subsetY;
-        matrix *validationPredictions = lr.predict(validation);
-        curr = lr.compare(*validationPredictions, vl);
-        std::cout << "Epoch " << epoch+1 << " Cost " << curr << std::endl;
-        std::cout << "Validation Accuracy: " << (float)lr.accuracy(*validationPredictions, vl) << '%' << std::endl;
-        #endif
 
-        if (logistic_regression::abs(prev - curr) < 0.1) {
+        if (logistic_regression::abs(prev - curr) < 0.05) {
             break;
         }
         prev = curr;
