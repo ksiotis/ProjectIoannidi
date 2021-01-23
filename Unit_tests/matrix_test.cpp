@@ -2,8 +2,10 @@
 #include <string>
 
 #include "../include/acutest.h"
-#include "../include/matrix.hpp"
 #include "../include/utilities.hpp"
+#include "../include/thread.hpp"
+#include "../include/scheduler.hpp"
+#include "../include/matrix.hpp"
 
 void test_matrix_simple(void){
     matrix my(3,3);
@@ -49,14 +51,18 @@ void test_matrix_sum(void){
         4 5 6
         7 8 9*/
 
-    matrix *temp = test1.row(0);
+    matrix *temp = test1.rows(0, 1);
     TEST_CHECK(temp->table[0][0] == 1 && temp->table[0][1] == 2 && temp->table[0][2] == 3);
     delete temp;
-    temp = test1.row(1);
+    temp = test1.rows(1,2);
     TEST_CHECK(temp->table[0][0] == 4 && temp->table[0][1] == 5 && temp->table[0][2] == 6);
     delete temp;
-    temp = test1.row(2);
+    temp = test1.rows(2,3);
     TEST_CHECK(temp->table[0][0] == 7 && temp->table[0][1] == 8 && temp->table[0][2] == 9);
+    delete temp;
+    temp = test1.rows(1,3);
+    TEST_CHECK(temp->table[0][0] == 4 && temp->table[0][1] == 5 && temp->table[0][2] == 6 &&
+                temp->table[1][0] == 7 && temp->table[1][1] == 8 && temp->table[1][2] == 9);
     delete temp;
 }
 
