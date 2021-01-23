@@ -93,9 +93,36 @@ void fix_dim_recursive(treeNode<IndexObject> *currentNode, int &counter) {
     }
 }
 
-void Index::fix_dim(){
-    int counter = 0;
+void reset_dim_recursive(treeNode<IndexObject> *currentNode) {
+    treeNode<IndexObject> *left = currentNode->getLeft();
+    treeNode<IndexObject> *right = currentNode->getRight();
+    if (left != NULL) {
+        reset_dim_recursive(left);
+    }
 
+    currentNode->getContent()->setDim(-1);
+
+    if (right != NULL) {
+        reset_dim_recursive(right);
+    }
+}
+
+
+
+
+void printArray(float arr[] ,std::string str_arr[] , unsigned int size , std::string file)  
+{  
+    std::ofstream myfile;
+    myfile.open (file);
+    unsigned int i;  
+    for (i = 0; i < size; i++)  
+        myfile << str_arr[i] << ":" << arr[i] << std::endl;
+    myfile.close();
+}  
+
+void Index::fix_dim(list<json_index>* json_index_container){
+    // make dims normally
+    int counter = 0;
     int buckets = hash->getBucketNumber();
     for (int i = 0; i < buckets; i++) {
         avlTree<IndexObject> *currentTree = hash->getTree(i);
@@ -104,7 +131,58 @@ void Index::fix_dim(){
         }
     }
 
+    // words array make
+    listNode<IndexObject> *current = container->getStart();
+    std::string str_arr[words_counter];
+    unsigned int i = 0;
+    while (current != NULL) {
+        str_arr[i] = current->getContent()->getId();
+        i++;
+        current = current->getNext();
+    }
+
+
+    // add all vectors of tfidf
+    listNode<json_index> *json_current = json_index_container->getStart();
+    float temp[words_counter],tfidf[words_counter];
+    for (unsigned int i = 0; i < words_counter;i++){
+        temp[i] = tfidf[i] = 0;
+    }
+    while ( json_current != NULL){
+        get_vector_tfidf(this , json_current->getContent() , temp);
+        for (unsigned int i = 0; i < words_counter;i++){
+            tfidf[i] += temp[i];
+        }
+        json_current = json_current->getNext();
+        for (unsigned int i = 0; i < words_counter;i++){
+            temp[i] = 0;
+        }
+    } 
+
+    for (unsigned int i = 0; i < words_counter;i++){
+        tfidf[i] = tfidf[i] / words_counter;
+    }
+
+    // sort
+    printArray(tfidf,str_arr,1000,"before_quick");
+    quickSort(tfidf, str_arr , 0, words_counter-1);
+    printArray(tfidf,str_arr,1000,"after_quick");
+
+    //reset all dims to -1
+    for (int i = 0; i < buckets; i++) {
+        avlTree<IndexObject> *currentTree = hash->getTree(i);
+        if(currentTree != NULL) {
+            reset_dim_recursive(currentTree->getRoot());
+        }
+    }
+
+    // set top 1000 dims
+    for (int j=0; j < 1000; j++){
+        hash->getContentByKeyValue(str_arr[j])->setDim(j);
+    }
 }
+
+
 
 void Index::fix_idf(){
     listNode<IndexObject> *current = container->getStart();
@@ -251,6 +329,7 @@ void get_vector_tfidf(Index* index,json_index* json,float* vec){
     std::string word;
     int dimension;
     listNode<json_indexObject> *current = json->get_container()->getStart();
+    // JOHN
     while (current != NULL) {
         word = current->getContent()->getId();
         dimension = index->getDim(word);
@@ -259,6 +338,7 @@ void get_vector_tfidf(Index* index,json_index* json,float* vec){
         }
         current = current->getNext();
     }
+    
 }
 
 void insert_json(Index* index,hashtable<json_index>* json_index_hashtable,list<json_index>* json_index_container,list<jsonObject>* jsonContainer,int buckets,std::string id,std::string path){
@@ -294,7 +374,7 @@ void insert_json(Index* index,hashtable<json_index>* json_index_hashtable,list<j
         json_index_container->insert(j_index);
         json_index_hashtable->insert(j_index);
 
-        index->fix_dim();
+        index->fix_dim(json_index_container);
     }
 }
 
@@ -421,7 +501,7 @@ int make_tf_idf(std::string csvPath,Index* index,hashtable<json_index> *json_ind
 
         }
         index->fix_idf();
-        index->fix_dim();
+        index->fix_dim(json_index_container);
     }
     catch (const char* e) {
         std::cout << "File Error! " << e << std::endl;

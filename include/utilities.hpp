@@ -6,6 +6,10 @@
 int max(int first, int second);
 std::string id_to_path(std::string id,std::string folder);
 std::string removeWord(std::string str, std::string word);
+void swap(float* a, float* b);
+int partition (float arr[],std::string str_arr[], int low, int high);
+void quickSort(float arr[],std::string str_arr[],int low, int high);
+
 
 class generic{
     protected:
