@@ -502,7 +502,7 @@ int* transform_csv_to_vector(std::string csvPath,Index* index,hashtable<json_ind
             throw "Can't open file!";
     }
     int lines = end_line - start_line;
-    unsigned int vec_count = index->get_words_counter();
+    unsigned int vec_count = 1000;
     int *y = new int[lines];
 
     int currentLine = 0;

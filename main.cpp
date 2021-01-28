@@ -209,7 +209,7 @@ int main(int argc, char** argv) {
 
     std::cout << "vectorization..." << std::endl;
 
-    unsigned int vec_count = index.get_words_counter();
+    unsigned int vec_count = 1000;
     int *y;
     int *vl;
     int *tst;
